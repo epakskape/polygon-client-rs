@@ -2,7 +2,6 @@ use serde;
 use serde::Deserialize;
 
 use std::collections::HashMap;
-use std::u128;
 
 //
 // v3/reference/tickers

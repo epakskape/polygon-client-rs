@@ -1,5 +1,4 @@
 use std::env;
-use std::fmt;
 use std::collections::HashMap;
 
 use crate::types::*;
@@ -77,6 +76,11 @@ impl Client {
     
     pub async fn reference_locales(self, query_params: &HashMap<&str, &str>) -> Result<ReferenceLocalesResponse, reqwest::Error> {
         self.send_request::<ReferenceLocalesResponse>("/v2/reference/locales", query_params).await
+    }
+    
+    pub async fn reference_stock_splits(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<ReferenceStockSplitsResponse, reqwest::Error> {
+        let uri = format!("/v2/reference/splits/{}", stocks_ticker);
+        self.send_request::<ReferenceStockSplitsResponse>( &uri, query_params).await
     }
 }
 
@@ -162,6 +166,18 @@ mod tests {
         let bond = resp.results.iter().find(|x| x.locale == "US");
         assert_eq!(bond.is_some(), true);
         assert_eq!(bond.unwrap().name, "United States of America");
+    }
+
+    #[test]
+    fn test_reference_stock_splits() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).reference_stock_splits("MSFT", &query_params)
+        ).unwrap();
+        assert_eq!(resp.status, "OK");
+        let bond = resp.results.iter().find(|x| x.ex_date == "1998-02-23");
+        assert_eq!(bond.is_some(), true);
+        assert_eq!(bond.unwrap().ratio, 0.5);
     }
 
 

@@ -207,3 +207,30 @@ pub struct ReferenceLocalesResponseV2 {
 }
 
 pub type ReferenceLocalesResponse = ReferenceLocalesResponseV2;
+
+//
+// v2/reference/splits/{stockTicker}
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct ReferenceStockSplitsResultV2 {
+    pub ticker: String,
+    #[serde(rename = "exDate")]
+    pub ex_date: String,
+    #[serde(rename = "paymentDate")]
+    pub payment_date: String,
+    #[serde(rename = "declaredDate")]
+    pub declared_date: Option<String>,
+    pub ratio: f64,
+    pub tofactor: Option<u32>,
+    pub forfactor: Option<u32>
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct ReferenceStockSplitsResponseV2 {
+    pub status: String,
+    pub count: u32,
+    pub results: Vec<ReferenceStockSplitsResultV2>,
+}
+
+pub type ReferenceStockSplitsResponse = ReferenceStockSplitsResponseV2;

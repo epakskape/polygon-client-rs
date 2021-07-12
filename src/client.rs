@@ -82,6 +82,16 @@ impl Client {
         let uri = format!("/v2/reference/splits/{}", stocks_ticker);
         self.send_request::<ReferenceStockSplitsResponse>( &uri, query_params).await
     }
+    
+    pub async fn reference_stock_dividends(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<ReferenceStockDividendsResponse, reqwest::Error> {
+        let uri = format!("/v2/reference/dividends/{}", stocks_ticker);
+        self.send_request::<ReferenceStockDividendsResponse>( &uri, query_params).await
+    }
+    
+    pub async fn reference_stock_financials(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<ReferenceStockFinancialsResponse, reqwest::Error> {
+        let uri = format!("/v2/reference/financials/{}", stocks_ticker);
+        self.send_request::<ReferenceStockFinancialsResponse>( &uri, query_params).await
+    }
 }
 
 #[cfg(test)]
@@ -178,6 +188,34 @@ mod tests {
         let bond = resp.results.iter().find(|x| x.ex_date == "1998-02-23");
         assert_eq!(bond.is_some(), true);
         assert_eq!(bond.unwrap().ratio, 0.5);
+    }
+
+    #[test]
+    fn test_reference_stock_dividends() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).reference_stock_dividends("MSFT", &query_params)
+        ).unwrap();
+        assert_eq!(resp.status, "OK");
+        let bond = resp.results.iter().find(|x| x.ex_date == "2021-02-17");
+        assert_eq!(bond.is_some(), true);
+        assert_eq!(bond.unwrap().amount, 0.56);
+    }
+
+    #[test]
+    fn test_reference_stock_financials() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).reference_stock_financials("MSFT", &query_params)
+        ).unwrap();
+        assert_eq!(resp.status, "OK");
+        let fin = resp.results.iter().find(|x| x.ticker == "MSFT");
+        assert_eq!(fin.is_some(), true);
+        let resp = tokio_test::block_on(
+            Client::new(None, None).reference_stock_financials("AAPL", &query_params)
+        ).unwrap();
+        let fin = resp.results.iter().find(|x| x.ticker == "AAPL");
+        assert_eq!(fin.is_some(), true);
     }
 
 

@@ -516,3 +516,21 @@ pub struct ReferenceMarketStatusNowResponseV1 {
 }
 
 pub type ReferenceMarketStatusNowResponse = ReferenceMarketStatusNowResponseV1;
+
+//
+// v1/meta/exchanges
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesExchangeV1 {
+    pub id: u64,
+    #[serde(rename = "type")]
+    pub exchange_type: String,
+    pub market: String,
+    pub mic: Option<String>,
+    pub name: String,
+    pub tape: Option<String>,
+    pub code: Option<String>,
+}
+
+pub type StockEquitiesExchangesResponse = Vec<StockEquitiesExchangeV1>;

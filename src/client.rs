@@ -100,6 +100,10 @@ impl Client {
     pub async fn reference_market_status(self, query_params: &HashMap<&str, &str>) -> Result<ReferenceMarketStatusNowResponse, reqwest::Error> {
         self.send_request::<ReferenceMarketStatusNowResponse>("/v1/marketstatus/now", query_params).await
     }
+    
+    pub async fn stock_equities_exchanges(self, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesExchangesResponse, reqwest::Error> {
+        self.send_request::<StockEquitiesExchangesResponse>("/v1/meta/exchanges", query_params).await
+    }
 }
 
 #[cfg(test)]
@@ -242,6 +246,19 @@ mod tests {
             Client::new(None, None).reference_market_status(&query_params)
         ).unwrap();
         assert_ne!(resp.exchanges.len(), 0);
+    }
+
+
+    #[test]
+    fn test_stock_equities_exchanges() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_exchanges(&query_params)
+        ).unwrap();
+        assert_ne!(resp.len(), 0);
+        let dji = resp.iter().find(|x| x.code.is_some() && x.code.as_ref().unwrap() == "DJI");
+        assert_eq!(dji.is_some(), true);
+        assert_eq!(dji.unwrap().market, "index");
     }
 
 

@@ -104,12 +104,18 @@ impl Client {
     pub async fn stock_equities_exchanges(self, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesExchangesResponse, reqwest::Error> {
         self.send_request::<StockEquitiesExchangesResponse>("/v1/meta/exchanges", query_params).await
     }
+    
+    pub async fn stock_equities_condition_mappings(self, tick_type: TickType, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesConditionMappingsResponse, reqwest::Error> {
+        let uri = format!("/v1/meta/conditions/{}", tick_type.to_string().to_lowercase());
+        self.send_request::<StockEquitiesConditionMappingsResponse>( &uri, query_params).await
+    }
 }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
     use crate::client::Client;
+    use crate::types::*;
 
     #[test]
     fn test_reference_tickers() {
@@ -248,7 +254,6 @@ mod tests {
         assert_ne!(resp.exchanges.len(), 0);
     }
 
-
     #[test]
     fn test_stock_equities_exchanges() {
         let query_params = HashMap::new();
@@ -259,6 +264,17 @@ mod tests {
         let dji = resp.iter().find(|x| x.code.is_some() && x.code.as_ref().unwrap() == "DJI");
         assert_eq!(dji.is_some(), true);
         assert_eq!(dji.unwrap().market, "index");
+    }
+
+    #[test]
+    fn test_stock_equities_condition_mappings() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_condition_mappings(TickType::Trades, &query_params)
+        ).unwrap();
+        assert_ne!(resp.len(), 0);
+        let regular = resp.iter().find(|x| x.1 == "Regular");
+        assert_eq!(regular.is_some(), true);
     }
 
 

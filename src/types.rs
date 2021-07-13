@@ -1,6 +1,7 @@
 use serde;
 use serde::Deserialize;
 
+use std::fmt;
 use std::collections::HashMap;
 
 //
@@ -534,3 +535,21 @@ pub struct StockEquitiesExchangeV1 {
 }
 
 pub type StockEquitiesExchangesResponse = Vec<StockEquitiesExchangeV1>;
+
+//
+// v1/meta/conditions/{ticktype}
+//
+
+#[derive(Debug)]
+pub enum TickType {
+    Trades,
+    Quotes,
+}
+
+impl fmt::Display for TickType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{:?}", self)
+    }
+}
+
+pub type StockEquitiesConditionMappingsResponse = HashMap<u32, String>;

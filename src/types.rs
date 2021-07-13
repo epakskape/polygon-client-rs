@@ -553,3 +553,21 @@ impl fmt::Display for TickType {
 }
 
 pub type StockEquitiesConditionMappingsResponse = HashMap<u32, String>;
+
+//
+// v1/meta/crypto-exchanges
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct CryptoExchange {
+    pub id: u32,
+    #[serde(rename = "type")]
+    pub exchange_type: Option<String>,
+    pub market: String,
+    pub name: String,
+    pub url: String,
+    pub locale: Option<String>,
+    pub tier: Option<String>,
+}
+
+pub type CryptoCryptoExchangesResponse = Vec<CryptoExchange>;

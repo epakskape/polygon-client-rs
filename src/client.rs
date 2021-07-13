@@ -48,6 +48,10 @@ impl Client {
         res.json::<RespType>().await
     }
 
+    // 
+    // Reference APIs
+    //
+
     pub async fn reference_tickers(self, query_params: &HashMap<&str, &str>) -> Result<ReferenceTickersResponse, reqwest::Error> {
         self.send_request::<ReferenceTickersResponse>("/v3/reference/tickers", query_params).await
     }
@@ -100,6 +104,10 @@ impl Client {
     pub async fn reference_market_status(self, query_params: &HashMap<&str, &str>) -> Result<ReferenceMarketStatusNowResponse, reqwest::Error> {
         self.send_request::<ReferenceMarketStatusNowResponse>("/v1/marketstatus/now", query_params).await
     }
+
+    //
+    // Stock equities APIs
+    //
     
     pub async fn stock_equities_exchanges(self, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesExchangesResponse, reqwest::Error> {
         self.send_request::<StockEquitiesExchangesResponse>("/v1/meta/exchanges", query_params).await
@@ -109,6 +117,15 @@ impl Client {
         let uri = format!("/v1/meta/conditions/{}", tick_type.to_string().to_lowercase());
         self.send_request::<StockEquitiesConditionMappingsResponse>( &uri, query_params).await
     }
+
+    //
+    // Crypto APIs
+    //
+
+    pub async fn crypto_crypto_exchanges(self, query_params: &HashMap<&str, &str>) -> Result<CryptoCryptoExchangesResponse, reqwest::Error> {
+        self.send_request::<CryptoCryptoExchangesResponse>("/v1/meta/crypto-exchanges", query_params).await
+    }
+
 }
 
 #[cfg(test)]
@@ -275,6 +292,18 @@ mod tests {
         assert_ne!(resp.len(), 0);
         let regular = resp.iter().find(|x| x.1 == "Regular");
         assert_eq!(regular.is_some(), true);
+    }
+
+
+    #[test]
+    fn test_crypto_crypto_exchanges() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).crypto_crypto_exchanges(&query_params)
+        ).unwrap();
+        assert_ne!(resp.len(), 0);
+        let coinbase = resp.iter().find(|x| x.name == "Coinbase");
+        assert_eq!(coinbase.is_some(), true);
     }
 
 

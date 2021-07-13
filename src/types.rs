@@ -153,10 +153,10 @@ pub struct ReferenceTickerNewsResultsV2 {
     pub author: String,
     pub published_utc: String,
     pub article_url: String,
-    pub tickers: Vec<String>,
-    pub amp_url: String,
-    pub image_url: String,
-    pub description: String,
+    pub tickers: Option<Vec<String>>,
+    pub amp_url: Option<String>,
+    pub image_url: Option<String>,
+    pub description: Option<String>,
     pub keywords: Option<Vec<String>>,
 }
 
@@ -313,9 +313,9 @@ pub struct ReferenceStockFinancialsResultV2 {
     pub depreciation_amortization_and_accretion: Option<i64>,
     pub deposits: Option<u64>,
     #[serde(rename = "dividendYield")]
-    pub dividend_yield: f64,
+    pub dividend_yield: Option<f64>,
     #[serde(rename = "dividendsPerBasicCommonShare")]
-    pub dividends_per_basic_common_share: f64,
+    pub dividends_per_basic_common_share: Option<f64>,
     #[serde(rename = "earningBeforeInterestTaxes")]
     pub earning_before_interest_taxes: Option<i64>,
     #[serde(rename = "earningBeforeInterestTaxesUSD")]
@@ -349,7 +349,7 @@ pub struct ReferenceStockFinancialsResultV2 {
     #[serde(rename = "freeCashFlowPerShare")]
     pub free_cash_flow_per_share: Option<f64>,
     #[serde(rename = "foreignCurrencyUSDExchangeRate")]
-    pub foreign_currency_usd_exchange_rate: f64,
+    pub foreign_currency_usd_exchange_rate: Option<f64>,
     #[serde(rename = "grossProfit")]
     pub gross_profit: Option<i64>,
     #[serde(rename = "grossMargin")]
@@ -452,10 +452,10 @@ pub struct ReferenceStockFinancialsResultV2 {
     #[serde(rename = "sellingGeneralAndAdministrativeExpense")]
     pub selling_general_and_administrative_expense: Option<i64>,
     #[serde(rename = "shareFactor")]
-    pub share_factor: f64,
+    pub share_factor: Option<f64>,
     pub shares: Option<u64>,
     #[serde(rename = "weightedAverageShares")]
-    pub weighted_average_shares: i64,
+    pub weighted_average_shares: Option<i64>,
     #[serde(rename = "weightedAverageSharesDiluted")]
     pub weighted_average_shares_diluted: Option<i64>,
     #[serde(rename = "salesPerShare")]
@@ -481,3 +481,38 @@ pub struct ReferenceStockFinancialsResponseV2 {
 }
 
 pub type ReferenceStockFinancialsResponse = ReferenceStockFinancialsResponseV2;
+
+//
+// v1/marketstatus/upcoming
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct MarketStatusUpcoming {
+    pub exchange: String,
+    pub name: String,
+    pub date: String,
+    pub status: String,
+    pub open: Option<String>,
+    pub close: Option<String>
+}
+
+pub type ReferenceMarketStatusUpcomingResponse = Vec<MarketStatusUpcoming>;
+
+//
+// v1/marketstatus/now
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct ReferenceMarketStatusNowResponseV1 {
+    pub market: String,
+    #[serde(rename = "earlyHours")]
+    pub early_hours: bool,
+    #[serde(rename = "afterHours")]
+    pub after_hours: bool,
+    #[serde(rename = "serverTime")]
+    pub server_time: String,
+    pub exchanges: HashMap<String, String>,
+    pub currencies: HashMap<String, String>
+}
+
+pub type ReferenceMarketStatusNowResponse = ReferenceMarketStatusNowResponseV1;

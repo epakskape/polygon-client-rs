@@ -92,6 +92,14 @@ impl Client {
         let uri = format!("/v2/reference/financials/{}", stocks_ticker);
         self.send_request::<ReferenceStockFinancialsResponse>( &uri, query_params).await
     }
+    
+    pub async fn reference_market_holidays(self, query_params: &HashMap<&str, &str>) -> Result<ReferenceMarketStatusUpcomingResponse, reqwest::Error> {
+        self.send_request::<ReferenceMarketStatusUpcomingResponse>("/v1/marketstatus/upcoming", query_params).await
+    }
+    
+    pub async fn reference_market_status(self, query_params: &HashMap<&str, &str>) -> Result<ReferenceMarketStatusNowResponse, reqwest::Error> {
+        self.send_request::<ReferenceMarketStatusNowResponse>("/v1/marketstatus/now", query_params).await
+    }
 }
 
 #[cfg(test)]
@@ -216,6 +224,24 @@ mod tests {
         ).unwrap();
         let fin = resp.results.iter().find(|x| x.ticker == "AAPL");
         assert_eq!(fin.is_some(), true);
+    }
+
+    #[test]
+    fn test_reference_market_holidays() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).reference_market_holidays(&query_params)
+        ).unwrap();
+        assert_ne!(resp.len(), 0);
+    }
+
+    #[test]
+    fn test_reference_market_status() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).reference_market_status(&query_params)
+        ).unwrap();
+        assert_ne!(resp.exchanges.len(), 0);
     }
 
 

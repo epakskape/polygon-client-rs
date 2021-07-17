@@ -1,6 +1,8 @@
 use std::env;
 use std::collections::HashMap;
 
+use chrono::prelude::*;
+
 use crate::types::*;
 
 static DEFAULT_API_URL: &str = "https://api.polygon.io";
@@ -293,6 +295,7 @@ mod tests {
         let regular = resp.iter().find(|x| x.1 == "Regular");
         assert_eq!(regular.is_some(), true);
     }
+
 
 
     #[test]

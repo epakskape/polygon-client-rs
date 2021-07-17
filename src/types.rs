@@ -571,3 +571,23 @@ pub struct CryptoExchange {
 }
 
 pub type CryptoCryptoExchangesResponse = Vec<CryptoExchange>;
+
+//
+// v2/ticks/stocks/trades/{ticker}/{date}
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesHistoricTradeResultV2 {
+
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesHistoricTradesResponseV2 {
+    pub ticker: String,
+    pub results_count: u32,
+    pub db_latency: u32,
+    pub success: bool,
+    pub results: Vec<StockEquitiesHistoricTradeResultV2>
+}
+
+pub type StockEquitiesHistoricTradesResponse = StockEquitiesHistoricTradesResponseV2;

@@ -917,6 +917,7 @@ pub struct StockEquitiesDailyOpenCloseResponse {
 #[derive(Clone, Deserialize, Debug)]
 pub struct StockEquitiesAggregates {
     pub T: Option<String>,
+    pub av: Option<u64>,
     pub c: f64,
     pub h: f64,
     pub l: f64,
@@ -971,4 +972,44 @@ pub struct StockEquitiesPreviousCloseResponse {
     pub count: u32,
     pub status: String,
     pub results: Vec<StockEquitiesAggregates>,
+}
+
+//
+// v2/snapshot/locale/{locale}/markets/{market}/tickers
+//
+
+#[allow(non_snake_case)]
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesQuote {
+    pub P: f64,
+    pub S: u64,
+    pub p: f64,
+    pub s: u64,
+    pub t: u64,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesTickerSnapshot {
+    pub day: StockEquitiesAggregates,
+    #[serde(rename = "lastQuote")]
+    pub last_quote: StockEquitiesQuote,
+    #[serde(rename = "lastTrade")]
+    pub last_trade: StockEquitiesHistoricTrade,
+    pub min: StockEquitiesAggregates,
+    #[serde(rename = "prevDay")]
+    pub prev_day: StockEquitiesAggregates,
+    pub ticker: String,
+    #[serde(rename = "todaysChange")]
+    pub todays_change: f64,
+    #[serde(rename = "todaysChangePerc")]
+    pub todays_change_perc: f64,
+    pub updated: u64,
+}
+
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesSnapshotAllTickersResponse {
+    pub count: u32,
+    pub status: String,
+    pub tickers: Vec<StockEquitiesTickerSnapshot>
 }

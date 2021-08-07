@@ -152,6 +152,11 @@ impl Client {
         self.send_request::<StockEquitiesPreviousCloseResponse>(&uri, query_params).await
     }
 
+    pub async fn stock_equities_snapshot_all_tickers(self, locale: &str, market: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesSnapshotAllTickersResponse, reqwest::Error> {
+        let uri = format!("/v2/snapshot/locale/{}/markets/{}/tickers", locale, market);
+        self.send_request::<StockEquitiesSnapshotAllTickersResponse>(&uri, query_params).await
+    }
+
     //
     // Crypto APIs
     //
@@ -433,6 +438,14 @@ mod tests {
         assert_eq!(result.is_some(), true);
         assert_eq!(result.unwrap().T.is_some(), true);
         assert_eq!(result.unwrap().T.as_ref().unwrap(), "MSFT");
+    }
+
+    #[test]
+    fn test_stock_equities_snapshot_all_tickers() {
+        let query_params = HashMap::new();
+        let _resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_snapshot_all_tickers("us", "stocks", &query_params)
+        ).unwrap();
     }
 
     #[test]

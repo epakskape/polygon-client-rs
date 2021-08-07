@@ -152,9 +152,19 @@ impl Client {
         self.send_request::<StockEquitiesPreviousCloseResponse>(&uri, query_params).await
     }
 
-    pub async fn stock_equities_snapshot_all_tickers(self, locale: &str, market: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesSnapshotAllTickersResponse, reqwest::Error> {
-        let uri = format!("/v2/snapshot/locale/{}/markets/{}/tickers", locale, market);
+    pub async fn stock_equities_snapshot_all_tickers(self, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesSnapshotAllTickersResponse, reqwest::Error> {
+        let uri = format!("/v2/snapshot/locale/us/markets/stocks/tickers");
         self.send_request::<StockEquitiesSnapshotAllTickersResponse>(&uri, query_params).await
+    }
+
+    pub async fn stock_equities_snapshot_single_ticker(self, ticker: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesSnapshotAllTickersResponse, reqwest::Error> {
+        let uri = format!("/v2/snapshot/locale/us/markets/stocks/tickers/{}", ticker);
+        self.send_request::<StockEquitiesSnapshotAllTickersResponse>(&uri, query_params).await
+    }
+
+    pub async fn stock_equities_snapshot_gainers_losers(self, direction: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesSnapshotGainersLosersResponse, reqwest::Error> {
+        let uri = format!("/v2/snapshot/locale/us/markets/stocks/{}", direction);
+        self.send_request::<StockEquitiesSnapshotGainersLosersResponse>(&uri, query_params).await
     }
 
     //
@@ -444,9 +454,18 @@ mod tests {
     fn test_stock_equities_snapshot_all_tickers() {
         let query_params = HashMap::new();
         let _resp = tokio_test::block_on(
-            Client::new(None, None).stock_equities_snapshot_all_tickers("us", "stocks", &query_params)
+            Client::new(None, None).stock_equities_snapshot_all_tickers(&query_params)
         ).unwrap();
     }
+
+    #[test]
+    fn test_stock_equities_snapshot_gainers_losers() {
+        let query_params = HashMap::new();
+        let _resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_snapshot_gainers_losers("gainers", &query_params)
+        ).unwrap();
+    }
+
 
     #[test]
     fn test_crypto_crypto_exchanges() {

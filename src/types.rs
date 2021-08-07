@@ -1006,10 +1006,19 @@ pub struct StockEquitiesTickerSnapshot {
     pub updated: u64,
 }
 
-
 #[derive(Clone, Deserialize, Debug)]
 pub struct StockEquitiesSnapshotAllTickersResponse {
     pub count: u32,
+    pub status: String,
+    pub tickers: Vec<StockEquitiesTickerSnapshot>
+}
+
+//
+// v2/snapshot/locale/us/markets/stocks/{direction}
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesSnapshotGainersLosersResponse {
     pub status: String,
     pub tickers: Vec<StockEquitiesTickerSnapshot>
 }

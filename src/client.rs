@@ -64,12 +64,12 @@ impl Client {
     
     pub async fn reference_ticker_details(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<ReferenceTickerDetailsResponse, reqwest::Error> {
         let uri = format!("/v1/meta/symbols/{}/company", stocks_ticker);
-        self.send_request::<ReferenceTickerDetailsResponse>( &uri, query_params).await
+        self.send_request::<ReferenceTickerDetailsResponse>(&uri, query_params).await
     }
     
     pub async fn reference_ticker_details_vx(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<ReferenceTickerDetailsResponseVX, reqwest::Error> {
         let uri = format!("/vX/reference/tickers/{}", stocks_ticker);
-        self.send_request::<ReferenceTickerDetailsResponseVX>( &uri, query_params).await
+        self.send_request::<ReferenceTickerDetailsResponseVX>(&uri, query_params).await
     }
     
     pub async fn reference_ticker_news(self, query_params: &HashMap<&str, &str>) -> Result<ReferenceTickerNewsResponse, reqwest::Error> {
@@ -86,17 +86,21 @@ impl Client {
     
     pub async fn reference_stock_splits(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<ReferenceStockSplitsResponse, reqwest::Error> {
         let uri = format!("/v2/reference/splits/{}", stocks_ticker);
-        self.send_request::<ReferenceStockSplitsResponse>( &uri, query_params).await
+        self.send_request::<ReferenceStockSplitsResponse>(&uri, query_params).await
     }
     
     pub async fn reference_stock_dividends(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<ReferenceStockDividendsResponse, reqwest::Error> {
         let uri = format!("/v2/reference/dividends/{}", stocks_ticker);
-        self.send_request::<ReferenceStockDividendsResponse>( &uri, query_params).await
+        self.send_request::<ReferenceStockDividendsResponse>(&uri, query_params).await
     }
     
     pub async fn reference_stock_financials(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<ReferenceStockFinancialsResponse, reqwest::Error> {
         let uri = format!("/v2/reference/financials/{}", stocks_ticker);
-        self.send_request::<ReferenceStockFinancialsResponse>( &uri, query_params).await
+        self.send_request::<ReferenceStockFinancialsResponse>(&uri, query_params).await
+    }
+    
+    pub async fn reference_stock_financials_vx(self, query_params: &HashMap<&str, &str>) -> Result<ReferenceStockFinancialsVXResponse, reqwest::Error> {
+        self.send_request::<ReferenceStockFinancialsVXResponse>("/vX/reference/financials", query_params).await
     }
     
     pub async fn reference_market_holidays(self, query_params: &HashMap<&str, &str>) -> Result<ReferenceMarketStatusUpcomingResponse, reqwest::Error> {
@@ -117,7 +121,7 @@ impl Client {
     
     pub async fn stock_equities_condition_mappings(self, tick_type: TickType, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesConditionMappingsResponse, reqwest::Error> {
         let uri = format!("/v1/meta/conditions/{}", tick_type.to_string().to_lowercase());
-        self.send_request::<StockEquitiesConditionMappingsResponse>( &uri, query_params).await
+        self.send_request::<StockEquitiesConditionMappingsResponse>(&uri, query_params).await
     }
 
     //
@@ -254,6 +258,26 @@ mod tests {
         let fin = resp.results.iter().find(|x| x.ticker == "AAPL");
         assert_eq!(fin.is_some(), true);
     }
+
+    #[test]
+    fn test_reference_stock_financials_vx() {
+        let mut query_params = HashMap::new();
+        query_params.insert("ticker", "MSFT");
+        let resp = tokio_test::block_on(
+            Client::new(None, None).reference_stock_financials_vx(&query_params)
+        ).unwrap();
+        assert_eq!(resp.status, "OK");
+        assert_eq!(resp.count, 1);
+        let result = resp.results.first().unwrap();
+        for v in &result.financials.balance_sheet {
+            println!("{} = true", v.0);
+        }
+        let income_statement = &result.financials.income_statement;
+        assert_eq!(income_statement.contains_key(FAC_REVENUES), true);
+        assert_eq!(income_statement.get(FAC_REVENUES).unwrap().unit.is_some(), true);
+        assert_eq!(income_statement.get(FAC_REVENUES).unwrap().unit.as_ref().unwrap(), "USD");
+    }
+
 
     #[test]
     fn test_reference_market_holidays() {

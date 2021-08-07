@@ -484,6 +484,160 @@ pub struct ReferenceStockFinancialsResponseV2 {
 pub type ReferenceStockFinancialsResponse = ReferenceStockFinancialsResponseV2;
 
 //
+// vX/reference/financials
+//
+
+pub const FAC_ASSETS: &str = "assets";
+pub const FAC_BALANCE_SHEET_DATE: &str = "balance_sheet_date";
+pub const FAC_BALANCE_SHEET_FORMAT: &str = "balance_sheet_format";
+pub const FAC_BENEFITS_COSTS_EXPENSES: &str = "benefits_costs_expenses";
+pub const FAC_CAPITALIZATION: &str = "capitalization";
+pub const FAC_COMMITMENTS_AND_CONTINGENCIES: &str = "commitments_and_contingencies";
+pub const FAC_COMPREHENSIVE_INCOME_LOSS: &str = "comprehensive_income_loss";
+pub const FAC_COMPREHENSIVE_INCOME_LOSS_ATTRIBUTABLE_TO_NONCONTROLLING_INTEREST: &str = "comprehensive_income_loss_attributable_to_noncontrolling_interest";
+pub const FAC_COMPREHENSIVE_INCOME_LOSS_ATTRIBUTABLE_TO_PARENT: &str = "comprehensive_income_loss_attributable_to_parent";
+pub const FAC_COSTS_AND_EXPENSES: &str = "costs_and_expenses";
+pub const FAC_COST_OF_REVENUE: &str = "cost_of_revenue";
+pub const FAC_COST_OF_REVENUE_GOODS: &str = "cost_of_revenue_goods";
+pub const FAC_COST_OF_REVENUE_SERVICES: &str = "cost_of_revenue_services";
+pub const FAC_CURRENT_ASSETS: &str = "current_assets";
+pub const FAC_CURRENT_LIABILITIES: &str = "current_liabilities";
+pub const FAC_DOCUMENT_TYPE: &str = "document_type";
+pub const FAC_ENTITY_CENTRAL_INDEX_KEY: &str = "entity_central_index_key";
+pub const FAC_ENTITY_FILER_CATEGORY: &str = "entity_filer_category";
+pub const FAC_ENTITY_REGISTRANT_NAME: &str = "entity_registrant_name";
+pub const FAC_EQUITY: &str = "equity";
+pub const FAC_EQUITY_ATTRIBUTABLE_TO_NONCONTROLLING_INTEREST: &str = "equity_attributable_to_noncontrolling_interest";
+pub const FAC_EQUITY_ATTRIBUTABLE_TO_PARENT: &str = "equity_attributable_to_parent";
+pub const FAC_EXCHANGE_GAINS_LOSSES: &str = "exchange_gains_losses";
+pub const FAC_EXTRAORDINARY_ITEMS_OF_INCOME_EXPENSE_NET_OF_TAX: &str = "extraordinary_items_of_income_expense_net_of_tax";
+pub const FAC_FISCAL_PERIOD_FOCUS: &str = "fiscal_period_focus";
+pub const FAC_FISCAL_YEAR_END: &str = "fiscal_year_end";
+pub const FAC_FISCAL_YEAR_FOCUS: &str = "fiscal_year_focus";
+pub const FAC_FIXED_ASSETS: &str = "fixed_assets";
+pub const FAC_GAIN_LOSS_ON_DISPOSITION_STOCK_IN_SUBSIDIARY_OR_EQUITY_METHOD_INVESTEE: &str = "gain_loss_on_disposition_stock_in_subsidiary_or_equity_method_investee";
+pub const FAC_GAIN_LOSS_ON_SALE_PREVIOUSLY_UNISSUED_STOCK_BY_SUBSIDIARY_OR_EQUITY_INVESTEE_NONOPERATING_INCOME: &str = "gain_loss_on_sale_previously_unissued_stock_by_subsidiary_or_equity_investee_nonoperating_income";
+pub const FAC_GAIN_LOSS_ON_SALE_PROPERTIES_NET_TAX: &str = "gain_loss_on_sale_properties_net_tax";
+pub const FAC_GROSS_PROFIT: &str = "gross_profit";
+pub const FAC_INCOME_LOSS_BEFORE_EQUITY_METHOD_INVESTMENTS: &str = "income_loss_before_equity_method_investments";
+pub const FAC_INCOME_LOSS_FROM_CONTINUING_OPERATIONS_AFTER_TAX: &str = "income_loss_from_continuing_operations_after_tax";
+pub const FAC_INCOME_LOSS_FROM_CONTINUING_OPERATIONS_BEFORE_TAX: &str = "income_loss_from_continuing_operations_before_tax";
+pub const FAC_INCOME_LOSS_FROM_DISCONTINUED_OPERATIONS_NET_OF_TAX: &str = "income_loss_from_discontinued_operations_net_of_tax";
+pub const FAC_INCOME_LOSS_FROM_DISCONTINUED_OPERATIONS_NET_OF_TAX_ADJUSTMENT_TO_PRIOR_YEAR_GAIN_LOSS_ON_DISPOSAL: &str = "income_loss_from_discontinued_operations_net_of_tax_adjustment_to_prior_year_gain_loss_on_disposal";
+pub const FAC_INCOME_LOSS_FROM_DISCONTINUED_OPERATIONS_NET_OF_TAX_DURING_PHASE_OUT: &str = "income_loss_from_discontinued_operations_net_of_tax_during_phase_out";
+pub const FAC_INCOME_LOSS_FROM_DISCONTINUED_OPERATIONS_NET_OF_TAX_GAIN_LOSS_ON_DISPOSAL: &str = "income_loss_from_discontinued_operations_net_of_tax_gain_loss_on_disposal";
+pub const FAC_INCOME_LOSS_FROM_DISCONTINUED_OPERATIONS_NET_OF_TAX_PROVISION_FOR_GAIN_LOSS_ON_DISPOSAL: &str = "income_loss_from_discontinued_operations_net_of_tax_provision_for_gain_loss_on_disposal";
+pub const FAC_INCOME_LOSS_FROM_EQUITY_METHOD_INVESTMENTS: &str = "income_loss_from_equity_method_investments";
+pub const FAC_INCOME_STATEMENT_FORMAT: &str = "income_statement_format";
+pub const FAC_INCOME_STATEMENT_START_PERIOD_YEAR_TO_DATE: &str = "income_statement_start_period_year_to_date";
+pub const FAC_INCOME_TAX_EXPENSE_BENEFIT: &str = "income_tax_expense_benefit";
+pub const FAC_INCOME_TAX_EXPENSE_BENEFIT_CURRENT: &str = "income_tax_expense_benefit_current";
+pub const FAC_INCOME_TAX_EXPENSE_BENEFIT_DEFERRED: &str = "income_tax_expense_benefit_deferred";
+pub const FAC_INDIRECT_OPERATING_NONOPERATING_COSTS_EXPENSES: &str = "indirect_operating_nonoperating_costs_expenses";
+pub const FAC_INTEREST_AND_DEBT_EXPENSE: &str = "interest_and_debt_expense";
+pub const FAC_INTEREST_AND_DIVIDEND_INCOME_OPERATING: &str = "interest_and_dividend_income_operating";
+pub const FAC_INTEREST_EXPENSE: &str = "interest_expense";
+pub const FAC_INTEREST_EXPENSE_OPERATING: &str = "interest_expense_operating";
+pub const FAC_INTEREST_INCOME_EXPENSE_AFTER_PROVISION_FOR_LOSSES: &str = "interest_income_expense_after_provision_for_losses";
+pub const FAC_INTEREST_INCOME_EXPENSE_OPERATING_NET: &str = "interest_income_expense_operating_net";
+pub const FAC_LIABILITIES: &str = "liabilities";
+pub const FAC_LIABILITIES_AND_EQUITY: &str = "liabilities_and_equity";
+pub const FAC_LONG_TERM_DEBT: &str = "long_term_debt";
+pub const FAC_NET_CASH_FLOW: &str = "net_cash_flow";
+pub const FAC_NET_CASH_FLOW_CONTINUING: &str = "net_cash_flow_continuing";
+pub const FAC_NET_CASH_FLOW_DISCONTINUED: &str = "net_cash_flow_discontinued";
+pub const FAC_NET_CASH_FLOW_FROM_FINANCING_ACTIVITIES: &str = "net_cash_flow_from_financing_activities";
+pub const FAC_NET_CASH_FLOW_FROM_FINANCING_ACTIVITIES_CONTINUING: &str = "net_cash_flow_from_financing_activities_continuing";
+pub const FAC_NET_CASH_FLOW_FROM_FINANCING_ACTIVITIES_DISCONTINUED: &str = "net_cash_flow_from_financing_activities_discontinued";
+pub const FAC_NET_CASH_FLOW_FROM_INVESTING_ACTIVITIES: &str = "net_cash_flow_from_investing_activities";
+pub const FAC_NET_CASH_FLOW_FROM_INVESTING_ACTIVITIES_CONTINUING: &str = "net_cash_flow_from_investing_activities_continuing";
+pub const FAC_NET_CASH_FLOW_FROM_INVESTING_ACTIVITIES_DISCONTINUED: &str = "net_cash_flow_from_investing_activities_discontinued";
+pub const FAC_NET_CASH_FLOW_FROM_OPERATING_ACTIVITIES: &str = "net_cash_flow_from_operating_activities";
+pub const FAC_NET_CASH_FLOW_FROM_OPERATING_ACTIVITIES_CONTINUING: &str = "net_cash_flow_from_operating_activities_continuing";
+pub const FAC_NET_CASH_FLOW_FROM_OPERATING_ACTIVITIES_DISCONTINUED: &str = "net_cash_flow_from_operating_activities_discontinued";
+pub const FAC_NET_INCOME_LOSS: &str = "net_income_loss";
+pub const FAC_NET_INCOME_LOSS_ATTRIBUTABLE_TO_NONCONTROLLING_INTEREST: &str = "net_income_loss_attributable_to_noncontrolling_interest";
+pub const FAC_NET_INCOME_LOSS_ATTRIBUTABLE_TO_NONCONTROLLING_INTEREST_PLUS_PREFERRED_STOCK_DIVIDENDS_AND_OTHER_ADJUSTMENTS: &str = "net_income_loss_attributable_to_noncontrolling_interest_plus_preferred_stock_dividends_and_other_adjustments";
+pub const FAC_NET_INCOME_LOSS_ATTRIBUTABLE_TO_NONREDEEMABLE_NONCONTROLLING_INTEREST: &str = "net_income_loss_attributable_to_nonredeemable_noncontrolling_interest";
+pub const FAC_NET_INCOME_LOSS_ATTRIBUTABLE_TO_PARENT: &str = "net_income_loss_attributable_to_parent";
+pub const FAC_NET_INCOME_LOSS_ATTRIBUTABLE_TO_REDEEMABLE_NONCONTROLLING_INTEREST: &str = "net_income_loss_attributable_to_redeemable_noncontrolling_interest";
+pub const FAC_NET_INCOME_LOSS_AVAILABLE_TO_COMMON_STOCKHOLDERS_BASIC: &str = "net_income_loss_available_to_common_stockholders_basic";
+pub const FAC_NONCURRENT_ASSETS: &str = "noncurrent_assets";
+pub const FAC_NONCURRENT_LIABILITIES: &str = "noncurrent_liabilities";
+pub const FAC_NONINTEREST_EXPENSE: &str = "noninterest_expense";
+pub const FAC_NONINTEREST_INCOME: &str = "noninterest_income";
+pub const FAC_NONOPERATING_GAINS_LOSSES: &str = "nonoperating_gains_losses";
+pub const FAC_NONOPERATING_INCOME_LOSS: &str = "nonoperating_income_loss";
+pub const FAC_NONOPERATING_INCOME_LOSS_PLUS_INTEREST_AND_DEBT_EXPENSE: &str = "nonoperating_income_loss_plus_interest_and_debt_expense";
+pub const FAC_NONOPERATING_INCOME_PLUS_INTEREST_AND_DEBT_EXPENSE_PLUS_INCOME_FROM_EQUITY_METHOD_INVESTMENTS: &str = "nonoperating_income_plus_interest_and_debt_expense_plus_income_from_equity_method_investments";
+pub const FAC_OPERATING_AND_NONOPERATING_COSTS_AND_EXPENSES: &str = "operating_and_nonoperating_costs_and_expenses";
+pub const FAC_OPERATING_AND_NONOPERATING_REVENUES: &str = "operating_and_nonoperating_revenues";
+pub const FAC_OPERATING_EXPENSES: &str = "operating_expenses";
+pub const FAC_OPERATING_INCOME_LOSS: &str = "operating_income_loss";
+pub const FAC_OTHER_COMPREHENSIVE_INCOME_LOSS: &str = "other_comprehensive_income_loss";
+pub const FAC_OTHER_COMPREHENSIVE_INCOME_LOSS_ATTRIBUTABLE_TO_NONCONTROLLING_INTEREST: &str = "other_comprehensive_income_loss_attributable_to_noncontrolling_interest";
+pub const FAC_OTHER_COMPREHENSIVE_INCOME_LOSS_ATTRIBUTABLE_TO_PARENT: &str = "other_comprehensive_income_loss_attributable_to_parent";
+pub const FAC_OTHER_NONCURRENT_ASSETS_OF_REGULATED_ENTITY: &str = "other_noncurrent_assets_of_regulated_entity";
+pub const FAC_OTHER_NONCURRENT_LIABILITIES_OF_REGULATED_ENTITY: &str = "other_noncurrent_liabilities_of_regulated_entity";
+pub const FAC_OTHER_OPERATING_INCOME_EXPENSES: &str = "other_operating_income_expenses";
+pub const FAC_OTHER_THAN_FIXED_NONCURRENT_ASSETS: &str = "other_than_fixed_noncurrent_assets";
+pub const FAC_PARTICIPATING_SECURITIES_DISTRIBUTED_AND_UNDISTRIBUTED_EARNINGS_LOSS_BASIC: &str = "participating_securities_distributed_and_undistributed_earnings_loss_basic";
+pub const FAC_PREFERRED_STOCK_DIVIDENDS_AND_OTHER_ADJUSTMENTS: &str = "preferred_stock_dividends_and_other_adjustments";
+pub const FAC_PROVISION_FOR_LOAN_LEASE_AND_OTHER_LOSSES: &str = "provision_for_loan_lease_and_other_losses";
+pub const FAC_PUBLIC_UTILITIES_PROPERTY_PLANT_AND_EQUIPMENT_NET: &str = "public_utilities_property_plant_and_equipment_net";
+pub const FAC_REDEEMABLE_NONCONTROLLING_INTEREST: &str = "redeemable_noncontrolling_interest";
+pub const FAC_REDEEMABLE_NONCONTROLLING_INTEREST_COMMON: &str = "redeemable_noncontrolling_interest_common";
+pub const FAC_REDEEMABLE_NONCONTROLLING_INTEREST_OTHER: &str = "redeemable_noncontrolling_interest_other";
+pub const FAC_REDEEMABLE_NONCONTROLLING_INTEREST_PREFERRED: &str = "redeemable_noncontrolling_interest_preferred";
+pub const FAC_RETURN_ON_ASSETS: &str = "return_on_assets";
+pub const FAC_RETURN_ON_EQUITY: &str = "return_on_equity";
+pub const FAC_RETURN_ON_SALES: &str = "return_on_sales";
+pub const FAC_REVENUES: &str = "revenues";
+pub const FAC_REVENUES_EXCLUDING_INTEREST_DIVIDENDS: &str = "revenues_excluding_interest_dividends";
+pub const FAC_REVENUES_NET_INTEREST_EXPENSE: &str = "revenues_net_interest_expense";
+pub const FAC_TEMPORARY_EQUITY: &str = "temporary_equity";
+pub const FAC_TEMPORARY_EQUITY_ATTRIBUTABLE_TO_PARENT: &str = "temporary_equity_attributable_to_parent";
+pub const FAC_TRADING_SYMBOL: &str = "trading_symbol";
+pub const FAC_UNDISTRIBUTED_EARNINGS_LOSS_ALLOCATED_TO_PARTICIPATING_SECURITIES_BASIC: &str = "undistributed_earnings_loss_allocated_to_participating_securities_basic";
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct FundamentalAccountingConcept {
+    pub formula: Option<String>,
+    pub label: Option<String>,
+    pub order: Option<u32>,
+    pub unit: Option<String>,
+    pub value: Option<f64>,
+}
+#[derive(Clone, Deserialize, Debug)]
+pub struct FinancialDimensions {
+    pub balance_sheet: HashMap<String, FundamentalAccountingConcept>,
+    pub cash_flow_statement: HashMap<String, FundamentalAccountingConcept>,
+    pub comprehensive_income: HashMap<String, FundamentalAccountingConcept>,
+    pub income_statement: HashMap<String, FundamentalAccountingConcept>,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct ReferenceStockFinancialsVXResult {
+    pub cik: String,
+    pub company_name: String,
+    pub end_date: Option<String>,
+    pub financials: FinancialDimensions,
+    pub fiscal_period: String,
+    pub fiscal_year: String,
+    pub source_filing_file_url: String,
+    pub start_date: Option<String>
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct ReferenceStockFinancialsVXResponse {
+    pub count: u32,
+    pub next_url: String,
+    pub request_id: String,
+    pub results: Vec<ReferenceStockFinancialsVXResult>,
+    pub status: String,
+}
+
+//
 // v1/marketstatus/upcoming
 //
 
@@ -571,23 +725,3 @@ pub struct CryptoExchange {
 }
 
 pub type CryptoCryptoExchangesResponse = Vec<CryptoExchange>;
-
-//
-// v2/ticks/stocks/trades/{ticker}/{date}
-//
-
-#[derive(Clone, Deserialize, Debug)]
-pub struct StockEquitiesHistoricTradeResultV2 {
-
-}
-
-#[derive(Clone, Deserialize, Debug)]
-pub struct StockEquitiesHistoricTradesResponseV2 {
-    pub ticker: String,
-    pub results_count: u32,
-    pub db_latency: u32,
-    pub success: bool,
-    pub results: Vec<StockEquitiesHistoricTradeResultV2>
-}
-
-pub type StockEquitiesHistoricTradesResponse = StockEquitiesHistoricTradesResponseV2;

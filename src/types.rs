@@ -857,9 +857,9 @@ pub struct StockEquitiesHistoricTrade {
     pub q: u64,
     pub t: u64,
     pub y: u64,
-    pub c: Vec<u64>,
+    pub c: Option<Vec<u64>>,
     pub e: Option<u64>,
-    pub i: String,
+    pub i: Option<String>,
     pub p: f64,
     pub r: Option<u64>,
     pub s: f64,
@@ -875,3 +875,17 @@ pub struct StockEquitiesHistoricTradesV2Response {
 }
 
 pub type StockEquitiesHistoricTradesResponse = StockEquitiesHistoricTradesV2Response;
+
+//
+// v2/last/nbbo/{ticker}
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesLastQuoteForASymbolV2Response {
+    pub request_id: String,
+    pub status: String,
+    pub results: StockEquitiesHistoricTrade,
+}
+
+pub type StockEquitiesLastQuoteForASymbolResponse = StockEquitiesLastQuoteForASymbolV2Response;
+

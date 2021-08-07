@@ -127,6 +127,10 @@ impl Client {
         self.send_request::<StockEquitiesHistoricTradesResponse>(&uri, query_params).await
     }
 
+    pub async fn stock_equities_last_quote_for_a_symbol(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesLastQuoteForASymbolResponse, reqwest::Error> {
+        let uri = format!("/v2/last/nbbo/{}", stocks_ticker);
+        self.send_request::<StockEquitiesLastQuoteForASymbolResponse>(&uri, query_params).await
+    }
 
     //
     // Crypto APIs
@@ -329,6 +333,15 @@ mod tests {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
             Client::new(None, None).stock_equities_historic_trades("MSFT", &query_params)
+        ).unwrap();
+        assert_eq!(resp.results.T, "MSFT");
+    }
+
+    #[test]
+    fn test_stock_equities_last_quote_for_a_symbol() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_last_quote_for_a_symbol("MSFT", &query_params)
         ).unwrap();
         assert_eq!(resp.results.T, "MSFT");
     }

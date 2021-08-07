@@ -908,3 +908,33 @@ pub struct StockEquitiesDailyOpenCloseResponse {
     pub symbol: String,
     pub volume: f64,
 }
+
+//
+// v2/aggs/ticker/{ticker}/range/{multiplier}/{timespan}/{from}/{to}
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesAggregates {
+    pub c: f64,
+    pub h: f64,
+    pub l: f64,
+    pub n: f64,
+    pub o: f64,
+    pub t: u64,
+    pub v: f64,
+    pub vw: f64,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesAggregatesResponse {
+    pub ticker: String,
+    pub adjusted: bool,
+    #[serde(rename = "queryCount")]
+    pub query_count: u32,
+    pub request_id: String,
+    #[serde(rename = "resultsCount")]
+    pub results_count: u32,
+    pub count: u32,
+    pub status: String,
+    pub results: Vec<StockEquitiesAggregates>,
+} 

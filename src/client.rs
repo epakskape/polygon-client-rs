@@ -137,6 +137,11 @@ impl Client {
         self.send_request::<StockEquitiesDailyOpenCloseResponse>(&uri, query_params).await
     }
 
+    pub async fn stock_equities_aggregates(self, stocks_ticker: &str, multiplier: u32, timespan: &str, from: &str, to: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesAggregatesResponse, reqwest::Error> {
+        let uri = format!("/v2/aggs/ticker/{}/range/{}/{}/{}/{}", stocks_ticker, multiplier, timespan, from, to);
+        self.send_request::<StockEquitiesAggregatesResponse>(&uri, query_params).await
+    }
+
     //
     // Crypto APIs
     //
@@ -368,6 +373,26 @@ mod tests {
         assert_eq!(resp.pre_market, 224.03);
     }
 
+    #[test]
+    fn test_stock_equities_aggregates() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_aggregates("MSFT", 1, "day", "2020-10-14", "2020-10-14", &query_params)
+        ).unwrap();
+        assert_eq!(resp.ticker, "MSFT");
+        assert_eq!(resp.status, "OK");
+        assert_eq!(resp.query_count, 1);
+        assert_eq!(resp.results_count, 1);
+        let result = resp.results.first().unwrap();
+        assert_eq!(result.v, 23451713f64);
+        assert_eq!(result.vw, 221.41);
+        assert_eq!(result.o, 223f64);
+        assert_eq!(result.c, 220.86);
+        assert_eq!(result.h, 224.22);
+        assert_eq!(result.l, 219.13);
+        assert_eq!(result.t, 1602648000000);
+        assert_eq!(result.n, 244243f64);
+    }
 
     #[test]
     fn test_crypto_crypto_exchanges() {

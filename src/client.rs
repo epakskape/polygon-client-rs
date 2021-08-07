@@ -142,6 +142,12 @@ impl Client {
         self.send_request::<StockEquitiesAggregatesResponse>(&uri, query_params).await
     }
 
+    pub async fn stock_equities_grouped_daily(self, locale: &str, market: &str, date: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesGroupedDailyResponse, reqwest::Error> {
+        let uri = format!("/v2/aggs/grouped/locale/{}/market/{}/{}", locale, market, date);
+        self.send_request::<StockEquitiesGroupedDailyResponse>(&uri, query_params).await
+    }
+
+
     //
     // Crypto APIs
     //
@@ -385,14 +391,31 @@ mod tests {
         assert_eq!(resp.results_count, 1);
         let result = resp.results.first().unwrap();
         assert_eq!(result.v, 23451713f64);
-        assert_eq!(result.vw, 221.41);
+        assert_eq!(result.vw.unwrap(), 221.41);
         assert_eq!(result.o, 223f64);
         assert_eq!(result.c, 220.86);
         assert_eq!(result.h, 224.22);
         assert_eq!(result.l, 219.13);
         assert_eq!(result.t, 1602648000000);
-        assert_eq!(result.n, 244243f64);
+        assert_eq!(result.n.unwrap(), 244243f64);
     }
+
+    #[test]
+    fn test_stock_equities_grouped_daily() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_grouped_daily("us","stocks", "2020-10-14", &query_params)
+        ).unwrap();
+        assert_eq!(resp.status, "OK");
+        let msft = resp.results.iter().find(|x| x.T.is_some() && x.T.as_ref().unwrap() == "MSFT");
+        assert_eq!(msft.is_some(), true);
+        assert_eq!(msft.unwrap().vw.is_some(), true);
+        assert_eq!(msft.unwrap().vw.unwrap(), 221.41);
+        assert_eq!(msft.unwrap().o, 223f64);
+        assert_eq!(msft.unwrap().h, 224.22);
+        assert_eq!(msft.unwrap().l, 219.13);
+    }
+
 
     #[test]
     fn test_crypto_crypto_exchanges() {

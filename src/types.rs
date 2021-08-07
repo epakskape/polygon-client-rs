@@ -889,3 +889,22 @@ pub struct StockEquitiesLastQuoteForASymbolV2Response {
 
 pub type StockEquitiesLastQuoteForASymbolResponse = StockEquitiesLastQuoteForASymbolV2Response;
 
+//
+// v1/open-close/{ticker}/{date}
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesDailyOpenCloseResponse {
+    #[serde(rename = "afterHours")]
+    pub after_hours: f64,
+    pub close: f64,
+    pub from: String,
+    pub high: f64,
+    pub low: f64,
+    pub open: f64,
+    #[serde(rename = "preMarket")]
+    pub pre_market: f64,
+    pub status: String,
+    pub symbol: String,
+    pub volume: f64,
+}

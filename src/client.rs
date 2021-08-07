@@ -132,6 +132,11 @@ impl Client {
         self.send_request::<StockEquitiesLastQuoteForASymbolResponse>(&uri, query_params).await
     }
 
+    pub async fn stock_equities_daily_open_close(self, stocks_ticker: &str, date: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesDailyOpenCloseResponse, reqwest::Error> {
+        let uri = format!("/v1/open-close/{}/{}", stocks_ticker, date);
+        self.send_request::<StockEquitiesDailyOpenCloseResponse>(&uri, query_params).await
+    }
+
     //
     // Crypto APIs
     //
@@ -345,6 +350,24 @@ mod tests {
         ).unwrap();
         assert_eq!(resp.results.T, "MSFT");
     }
+
+    #[test]
+    fn test_stock_equities_daily_open_close() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_daily_open_close("MSFT", "2020-10-14", &query_params)
+        ).unwrap();
+        assert_eq!(resp.symbol, "MSFT");
+        assert_eq!(resp.status, "OK");
+        assert_eq!(resp.open, 223f64);
+        assert_eq!(resp.high, 224.22);
+        assert_eq!(resp.low, 219.13);
+        assert_eq!(resp.close, 220.86);
+        assert_eq!(resp.volume, 23451713f64);
+        assert_eq!(resp.after_hours, 220.3);
+        assert_eq!(resp.pre_market, 224.03);
+    }
+
 
     #[test]
     fn test_crypto_crypto_exchanges() {

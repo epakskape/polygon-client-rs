@@ -147,6 +147,10 @@ impl Client {
         self.send_request::<StockEquitiesGroupedDailyResponse>(&uri, query_params).await
     }
 
+    pub async fn stock_equities_previous_close(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesPreviousCloseResponse, reqwest::Error> {
+        let uri = format!("/v2/aggs/ticker/{}/prev", stocks_ticker);
+        self.send_request::<StockEquitiesPreviousCloseResponse>(&uri, query_params).await
+    }
 
     //
     // Crypto APIs
@@ -416,6 +420,20 @@ mod tests {
         assert_eq!(msft.unwrap().l, 219.13);
     }
 
+    #[test]
+    fn test_stock_equities_previous_close() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_previous_close("MSFT", &query_params)
+        ).unwrap();
+        assert_eq!(resp.ticker, "MSFT");
+        assert_eq!(resp.status, "OK");
+        assert_eq!(resp.results_count, 1);
+        let result = resp.results.first();
+        assert_eq!(result.is_some(), true);
+        assert_eq!(result.unwrap().T.is_some(), true);
+        assert_eq!(result.unwrap().T.as_ref().unwrap(), "MSFT");
+    }
 
     #[test]
     fn test_crypto_crypto_exchanges() {

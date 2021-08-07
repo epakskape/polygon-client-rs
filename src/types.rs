@@ -955,3 +955,20 @@ pub struct StockEquitiesGroupedDailyResponse {
     pub status: String,
     pub results: Vec<StockEquitiesAggregates>,
 }
+
+//
+// v2/aggs/ticker/{ticker}/prev
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct StockEquitiesPreviousCloseResponse {
+    pub ticker: String,
+    pub adjusted: bool,
+    #[serde(rename = "queryCount")]
+    pub query_count: u32,
+    #[serde(rename = "resultsCount")]
+    pub results_count: u32,
+    pub count: u32,
+    pub status: String,
+    pub results: Vec<StockEquitiesAggregates>,
+}

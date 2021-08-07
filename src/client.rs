@@ -1,8 +1,6 @@
 use std::env;
 use std::collections::HashMap;
 
-use chrono::prelude::*;
-
 use crate::types::*;
 
 static DEFAULT_API_URL: &str = "https://api.polygon.io";
@@ -123,6 +121,12 @@ impl Client {
         let uri = format!("/v1/meta/conditions/{}", tick_type.to_string().to_lowercase());
         self.send_request::<StockEquitiesConditionMappingsResponse>(&uri, query_params).await
     }
+ 
+    pub async fn stock_equities_historic_trades(self, stocks_ticker: &str, query_params: &HashMap<&str, &str>) -> Result<StockEquitiesHistoricTradesResponse, reqwest::Error> {
+        let uri = format!("/v2/last/trade/{}", stocks_ticker);
+        self.send_request::<StockEquitiesHistoricTradesResponse>(&uri, query_params).await
+    }
+
 
     //
     // Crypto APIs
@@ -320,7 +324,14 @@ mod tests {
         assert_eq!(regular.is_some(), true);
     }
 
-
+    #[test]
+    fn test_stock_equities_historic_trades() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            Client::new(None, None).stock_equities_historic_trades("MSFT", &query_params)
+        ).unwrap();
+        assert_eq!(resp.results.T, "MSFT");
+    }
 
     #[test]
     fn test_crypto_crypto_exchanges() {

@@ -532,7 +532,7 @@ mod tests {
             Client::new(None, None).stock_equities_historic_trades("MSFT", &query_params),
         )
         .unwrap();
-        assert_eq!(resp.results.T, "MSFT");
+        assert_eq!(resp.results.T.unwrap(), "MSFT");
     }
 
     #[test]
@@ -542,7 +542,7 @@ mod tests {
             Client::new(None, None).stock_equities_last_quote_for_a_symbol("MSFT", &query_params),
         )
         .unwrap();
-        assert_eq!(resp.results.T, "MSFT");
+        assert_eq!(resp.results.T.unwrap(), "MSFT");
     }
 
     #[test]
@@ -588,7 +588,7 @@ mod tests {
         assert_eq!(result.c, 220.86);
         assert_eq!(result.h, 224.22);
         assert_eq!(result.l, 219.13);
-        assert_eq!(result.t, 1602648000000);
+        assert_eq!(result.t.unwrap(), 1602648000000);
         assert_eq!(result.n.unwrap(), 244243f64);
     }
 

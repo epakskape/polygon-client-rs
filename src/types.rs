@@ -896,19 +896,19 @@ pub type CryptoCryptoExchangesResponse = Vec<CryptoExchange>;
 #[allow(non_snake_case)]
 #[derive(Clone, Deserialize, Debug)]
 pub struct StockEquitiesHistoricTrade {
-    pub T: String,
+    pub T: Option<String>,
     pub f: Option<u64>,
-    pub q: u64,
-    pub t: u64,
-    pub y: u64,
+    pub q: Option<u64>,
+    pub t: Option<u64>,
+    pub y: Option<u64>,
     pub c: Option<Vec<u64>>,
     pub e: Option<u64>,
     pub i: Option<String>,
-    pub p: f64,
+    pub p: Option<f64>,
     pub r: Option<u64>,
-    pub s: f64,
-    pub x: u64,
-    pub z: u64,
+    pub s: Option<f64>,
+    pub x: Option<u64>,
+    pub z: Option<u64>,
 }
 
 #[derive(Clone, Deserialize, Debug)]
@@ -967,7 +967,7 @@ pub struct StockEquitiesAggregates {
     pub l: f64,
     pub n: Option<f64>,
     pub o: f64,
-    pub t: u64,
+    pub t: Option<u64>,
     pub v: f64,
     pub vw: Option<f64>,
 }

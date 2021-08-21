@@ -11,7 +11,7 @@ async fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() == 0 {
-        println!("Usage: diviends <ticker1> <ticker2> <ticker3>");
+        println!("Usage: dividends <ticker1> <ticker2> <ticker3> ...");
         return;
     }
 

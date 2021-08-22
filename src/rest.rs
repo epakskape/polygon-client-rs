@@ -5,14 +5,14 @@ use crate::types::*;
 
 static DEFAULT_API_URL: &str = "https://api.polygon.io";
 
-pub struct Client {
+pub struct RESTClient {
     pub auth_key: String,
     pub api_url: String,
     pub timeout: Option<u32>,
     client: reqwest::Client,
 }
 
-impl Client {
+impl RESTClient {
     pub fn new(auth_key: Option<&str>, timeout: Option<u32>) -> Self {
         let api_url = match env::var("POLYGON_API_URL") {
             Ok(v) => v,
@@ -27,7 +27,7 @@ impl Client {
             },
         };
 
-        Client {
+        RESTClient {
             auth_key: auth_key_actual,
             api_url: api_url,
             timeout: timeout,
@@ -323,7 +323,7 @@ impl Client {
 
 #[cfg(test)]
 mod tests {
-    use crate::client::Client;
+    use crate::rest::RESTClient;
     use crate::types::*;
     use std::collections::HashMap;
 
@@ -332,7 +332,7 @@ mod tests {
         let mut query_params = HashMap::new();
         query_params.insert("ticker", "MSFT");
         let resp =
-            tokio_test::block_on(Client::new(None, None).reference_tickers(&query_params)).unwrap();
+            tokio_test::block_on(RESTClient::new(None, None).reference_tickers(&query_params)).unwrap();
         assert_eq!(resp.status, "OK");
         assert_eq!(resp.count, 1);
         assert_eq!(resp.results[0].market, "stocks");
@@ -343,7 +343,7 @@ mod tests {
     fn test_reference_ticker_types() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(Client::new(None, None).reference_ticker_types(&query_params))
+            tokio_test::block_on(RESTClient::new(None, None).reference_ticker_types(&query_params))
                 .unwrap();
         assert_eq!(resp.status, "OK");
         assert_eq!(resp.results.types["CS"], "Common Stock");
@@ -354,7 +354,7 @@ mod tests {
     fn test_reference_ticker_details() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            Client::new(None, None).reference_ticker_details("MSFT", &query_params),
+            RESTClient::new(None, None).reference_ticker_details("MSFT", &query_params),
         )
         .unwrap();
         assert_eq!(resp.country, "usa");
@@ -366,7 +366,7 @@ mod tests {
     fn test_reference_ticker_details_vx() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            Client::new(None, None).reference_ticker_details_vx("MSFT", &query_params),
+            RESTClient::new(None, None).reference_ticker_details_vx("MSFT", &query_params),
         )
         .unwrap();
         assert_eq!(resp.status, "OK");
@@ -378,7 +378,7 @@ mod tests {
     fn test_reference_ticker_news() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(Client::new(None, None).reference_ticker_news(&query_params))
+            tokio_test::block_on(RESTClient::new(None, None).reference_ticker_news(&query_params))
                 .unwrap();
         assert_eq!(resp.status, "OK");
     }
@@ -387,7 +387,7 @@ mod tests {
     fn test_reference_markets() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(Client::new(None, None).reference_markets(&query_params)).unwrap();
+            tokio_test::block_on(RESTClient::new(None, None).reference_markets(&query_params)).unwrap();
         assert_eq!(resp.status, "OK");
         let bond = resp.results.iter().find(|x| x.market == "BONDS");
         assert_eq!(bond.is_some(), true);
@@ -398,7 +398,7 @@ mod tests {
     fn test_reference_locales() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(Client::new(None, None).reference_locales(&query_params)).unwrap();
+            tokio_test::block_on(RESTClient::new(None, None).reference_locales(&query_params)).unwrap();
         assert_eq!(resp.status, "OK");
         let bond = resp.results.iter().find(|x| x.locale == "US");
         assert_eq!(bond.is_some(), true);
@@ -409,7 +409,7 @@ mod tests {
     fn test_reference_stock_splits() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            Client::new(None, None).reference_stock_splits("MSFT", &query_params),
+            RESTClient::new(None, None).reference_stock_splits("MSFT", &query_params),
         )
         .unwrap();
         assert_eq!(resp.status, "OK");
@@ -422,7 +422,7 @@ mod tests {
     fn test_reference_stock_dividends() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            Client::new(None, None).reference_stock_dividends("MSFT", &query_params),
+            RESTClient::new(None, None).reference_stock_dividends("MSFT", &query_params),
         )
         .unwrap();
         assert_eq!(resp.status, "OK");
@@ -435,14 +435,14 @@ mod tests {
     fn test_reference_stock_financials() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            Client::new(None, None).reference_stock_financials("MSFT", &query_params),
+            RESTClient::new(None, None).reference_stock_financials("MSFT", &query_params),
         )
         .unwrap();
         assert_eq!(resp.status, "OK");
         let fin = resp.results.iter().find(|x| x.ticker == "MSFT");
         assert_eq!(fin.is_some(), true);
         let resp = tokio_test::block_on(
-            Client::new(None, None).reference_stock_financials("AAPL", &query_params),
+            RESTClient::new(None, None).reference_stock_financials("AAPL", &query_params),
         )
         .unwrap();
         let fin = resp.results.iter().find(|x| x.ticker == "AAPL");
@@ -454,7 +454,7 @@ mod tests {
         let mut query_params = HashMap::new();
         query_params.insert("ticker", "MSFT");
         let resp = tokio_test::block_on(
-            Client::new(None, None).reference_stock_financials_vx(&query_params),
+            RESTClient::new(None, None).reference_stock_financials_vx(&query_params),
         )
         .unwrap();
         assert_eq!(resp.status, "OK");
@@ -484,7 +484,7 @@ mod tests {
     fn test_reference_market_holidays() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(Client::new(None, None).reference_market_holidays(&query_params))
+            tokio_test::block_on(RESTClient::new(None, None).reference_market_holidays(&query_params))
                 .unwrap();
         assert_ne!(resp.len(), 0);
     }
@@ -493,7 +493,7 @@ mod tests {
     fn test_reference_market_status() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(Client::new(None, None).reference_market_status(&query_params))
+            tokio_test::block_on(RESTClient::new(None, None).reference_market_status(&query_params))
                 .unwrap();
         assert_ne!(resp.exchanges.len(), 0);
     }
@@ -502,7 +502,7 @@ mod tests {
     fn test_stock_equities_exchanges() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(Client::new(None, None).stock_equities_exchanges(&query_params))
+            tokio_test::block_on(RESTClient::new(None, None).stock_equities_exchanges(&query_params))
                 .unwrap();
         assert_ne!(resp.len(), 0);
         let dji = resp
@@ -516,7 +516,7 @@ mod tests {
     fn test_stock_equities_condition_mappings() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            Client::new(None, None)
+            RESTClient::new(None, None)
                 .stock_equities_condition_mappings(TickType::Trades, &query_params),
         )
         .unwrap();
@@ -529,7 +529,7 @@ mod tests {
     fn test_stock_equities_historic_trades() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            Client::new(None, None).stock_equities_historic_trades("MSFT", &query_params),
+            RESTClient::new(None, None).stock_equities_historic_trades("MSFT", &query_params),
         )
         .unwrap();
         assert_eq!(resp.results.T.unwrap(), "MSFT");
@@ -539,7 +539,7 @@ mod tests {
     fn test_stock_equities_last_quote_for_a_symbol() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            Client::new(None, None).stock_equities_last_quote_for_a_symbol("MSFT", &query_params),
+            RESTClient::new(None, None).stock_equities_last_quote_for_a_symbol("MSFT", &query_params),
         )
         .unwrap();
         assert_eq!(resp.results.T.unwrap(), "MSFT");
@@ -548,7 +548,7 @@ mod tests {
     #[test]
     fn test_stock_equities_daily_open_close() {
         let query_params = HashMap::new();
-        let resp = tokio_test::block_on(Client::new(None, None).stock_equities_daily_open_close(
+        let resp = tokio_test::block_on(RESTClient::new(None, None).stock_equities_daily_open_close(
             "MSFT",
             "2020-10-14",
             &query_params,
@@ -568,7 +568,7 @@ mod tests {
     #[test]
     fn test_stock_equities_aggregates() {
         let query_params = HashMap::new();
-        let resp = tokio_test::block_on(Client::new(None, None).stock_equities_aggregates(
+        let resp = tokio_test::block_on(RESTClient::new(None, None).stock_equities_aggregates(
             "MSFT",
             1,
             "day",
@@ -595,7 +595,7 @@ mod tests {
     #[test]
     fn test_stock_equities_grouped_daily() {
         let query_params = HashMap::new();
-        let resp = tokio_test::block_on(Client::new(None, None).stock_equities_grouped_daily(
+        let resp = tokio_test::block_on(RESTClient::new(None, None).stock_equities_grouped_daily(
             "us",
             "stocks",
             "2020-10-14",
@@ -619,7 +619,7 @@ mod tests {
     fn test_stock_equities_previous_close() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            Client::new(None, None).stock_equities_previous_close("MSFT", &query_params),
+            RESTClient::new(None, None).stock_equities_previous_close("MSFT", &query_params),
         )
         .unwrap();
         assert_eq!(resp.ticker, "MSFT");
@@ -635,7 +635,7 @@ mod tests {
     fn test_stock_equities_snapshot_all_tickers() {
         let query_params = HashMap::new();
         let _resp = tokio_test::block_on(
-            Client::new(None, None).stock_equities_snapshot_all_tickers(&query_params),
+            RESTClient::new(None, None).stock_equities_snapshot_all_tickers(&query_params),
         )
         .unwrap();
     }
@@ -644,7 +644,7 @@ mod tests {
     fn test_stock_equities_snapshot_gainers_losers() {
         let query_params = HashMap::new();
         let _resp = tokio_test::block_on(
-            Client::new(None, None)
+            RESTClient::new(None, None)
                 .stock_equities_snapshot_gainers_losers("gainers", &query_params),
         )
         .unwrap();
@@ -654,7 +654,7 @@ mod tests {
     fn test_crypto_crypto_exchanges() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(Client::new(None, None).crypto_crypto_exchanges(&query_params))
+            tokio_test::block_on(RESTClient::new(None, None).crypto_crypto_exchanges(&query_params))
                 .unwrap();
         assert_ne!(resp.len(), 0);
         let coinbase = resp.iter().find(|x| x.name == "Coinbase");

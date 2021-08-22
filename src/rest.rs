@@ -1,9 +1,16 @@
 //! REST client for [polygon.io](https://polygon.io).
 //!
+//! # Authentication
+//!
+//! Use an [API key](https://polygon.io/dashboard/api-keys) to authenticate.
+//! This can be provided through the `auth_key` parameter to
+//! [`RESTClient::new()`] or through the `POLYGON_AUTH_KEY` environment variable.
+//!
 //! # Example
 //!
 //! ```
 //! use std::collections::HashMap;
+//!
 //! use polygon_client::rest::RESTClient;
 //!
 //! #[tokio::main]
@@ -34,6 +41,16 @@ pub struct RESTClient {
 }
 
 impl RESTClient {
+    /// Returns a new REST client.
+    ///
+    /// The `auth_key` parameter optionally provides the API key to use for
+    /// authentication. If `None` is provided, then the API key specified in the
+    /// `POLYGON_AUTH_KEY` environment variable is used.
+    ///
+    /// # Panics
+    ///
+    /// This function will panic if `auth_key` is `None` and the
+    /// `POLYGON_AUTH_KEY` environment variable is not set then.
     pub fn new(auth_key: Option<&str>, timeout: Option<u32>) -> Self {
         let api_url = match env::var("POLYGON_API_URL") {
             Ok(v) => v,
@@ -79,6 +96,9 @@ impl RESTClient {
     // Reference APIs
     //
 
+    /// Query all ticker symbols supported by polygon.io using the
+    /// [/v3/reference/tickers](https://polygon.io/docs/get_v3_reference_tickers_anchor)
+    /// API.
     pub async fn reference_tickers(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -87,6 +107,9 @@ impl RESTClient {
             .await
     }
 
+    /// Get a mapping of ticker types to their descriptive names using the
+    /// [/v2/reference/types](https://polygon.io/docs/get_v2_reference_types_anchor)
+    /// API.
     pub async fn reference_ticker_types(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -95,6 +118,9 @@ impl RESTClient {
             .await
     }
 
+    /// Get details for a ticker symbol's company/entity using the
+    /// [/v1/meta/symbols/{stocks_ticker}/company](https://polygon.io/docs/get_v1_meta_symbols__stocksTicker__company_anchor)
+    /// API.
     pub async fn reference_ticker_details(
         &self,
         stocks_ticker: &str,
@@ -105,6 +131,9 @@ impl RESTClient {
             .await
     }
 
+    /// Get details for a ticker symbol's company/entity using the
+    /// [/vX/reference/tickers/{stocks_ticker}](https://polygon.io/docs/get_vX_reference_tickers__ticker__anchor)
+    /// API.
     pub async fn reference_ticker_details_vx(
         &self,
         stocks_ticker: &str,
@@ -115,6 +144,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get the most recent news articles related to a stock ticker symbol using
+    /// the [/v2/reference/news](https://polygon.io/docs/get_v2_reference_news_anchor) API.
     pub async fn reference_ticker_news(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -123,6 +154,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get a list of markets that are currently supported by polygon.io using
+    /// the [/v2/reference/markets](https://polygon.io/docs/get_v2_reference_markets_anchor) API.
     pub async fn reference_markets(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -131,6 +164,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get a list of locales currently supported by polygon.io using the
+    /// [/v2/reference/locales](https://polygon.io/docs/get_v2_reference_locales_anchor) API.
     pub async fn reference_locales(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -139,6 +174,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get a list of historical stock splits for a ticker symbol using the
+    /// [/v2/reference/splits/{stocks_ticker}](https://polygon.io/docs/get_v2_reference_splits__stocksTicker__anchor) API.
     pub async fn reference_stock_splits(
         &self,
         stocks_ticker: &str,
@@ -149,6 +186,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get a list of historical dividends for a stock using the
+    /// [/v2/reference/dividends/{stocks_ticker}](https://polygon.io/docs/get_v2_reference_dividends__stocksTicker__anchor) API.
     pub async fn reference_stock_dividends(
         &self,
         stocks_ticker: &str,
@@ -159,6 +198,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get historical financial data for a stock ticker using the
+    /// [/v2/reference/financials/{stocks_ticker}](https://polygon.io/docs/get_v2_reference_financials__stocksTicker__anchor) API.
     pub async fn reference_stock_financials(
         &self,
         stocks_ticker: &str,
@@ -169,6 +210,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get historical financial data for a stock ticker using the
+    /// [/vX/reference/financials](https://polygon.io/docs/get_vX_reference_financials_anchor) API.
     pub async fn reference_stock_financials_vx(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -180,6 +223,8 @@ impl RESTClient {
         .await
     }
 
+    /// Get upcoming market holidays and their open/close items using the
+    /// [/v1/marketstatus/upcoming](https://polygon.io/docs/get_v1_marketstatus_upcoming_anchor) API.
     pub async fn reference_market_holidays(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -191,6 +236,8 @@ impl RESTClient {
         .await
     }
 
+    /// Get the current trading status of the exchanges and overall financial
+    /// markets using the [/v1/marketstatus/now](https://polygon.io/docs/get_v1_marketstatus_now_anchor) API.
     pub async fn reference_market_status(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -203,6 +250,8 @@ impl RESTClient {
     // Stock equities APIs
     //
 
+    /// Get a list of stock exchanges which are supported by polygon.io using
+    /// the [/v1/meta/exchanges](https://polygon.io/docs/get_v1_meta_exchanges_anchor) API.
     pub async fn stock_equities_exchanges(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -211,6 +260,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get a unified numerical mapping for conditions on trades and quotes
+    /// using the [/v1/meta/conditions/{tick_type}](https://polygon.io/docs/get_v1_meta_conditions__ticktype__anchor) API.
     pub async fn stock_equities_condition_mappings(
         &self,
         tick_type: TickType,
@@ -224,6 +275,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get the most recent trade for a given stock using the
+    /// [/v2/last/trade/{stocks_ticker}](https://polygon.io/docs/get_v2_last_trade__stocksTicker__anchor) API.
     pub async fn stock_equities_historic_trades(
         &self,
         stocks_ticker: &str,
@@ -234,6 +287,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get the most recent NBBO quote tick for a given stock using the
+    /// [/v2/last/nbbo/{stocks_ticker}](https://polygon.io/docs/get_v2_last_nbbo__stocksTicker__anchor) API.
     pub async fn stock_equities_last_quote_for_a_symbol(
         &self,
         stocks_ticker: &str,
@@ -244,6 +299,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get the open, close, and afterhours prices of a stock symbol on a
+    /// certain date using the [/v1/open-close/{stocks_ticker}/{date}](https://polygon.io/docs/get_v1_open-close__stocksTicker___date__anchor) API.
     pub async fn stock_equities_daily_open_close(
         &self,
         stocks_ticker: &str,
@@ -255,6 +312,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get aggregate bars for a stock over a given date range in custom time
+    /// window sizes using the [/v2/aggs/ticker/{stocks_ticker}/range/{multiplier}/{timespan}/{from}/{to}](https://polygon.io/docs/get_v2_aggs_ticker__stocksTicker__range__multiplier___timespan___from___to__anchor) API.
     pub async fn stock_equities_aggregates(
         &self,
         stocks_ticker: &str,
@@ -272,6 +331,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get the daily open, high, low, and close for the entire stocks and
+    /// equities market using the [/v2/aggs/grouped/locale/{locale}/market/{market}/{date}](https://polygon.io/docs/get_v2_aggs_grouped_locale_us_market_stocks__date__anchor) API.
     pub async fn stock_equities_grouped_daily(
         &self,
         locale: &str,
@@ -287,6 +348,8 @@ impl RESTClient {
             .await
     }
 
+    /// Get the previous day's open, high, low, and close for the specified
+    /// stock ticker using the [/v2/aggs/ticker/{stocks_ticker}/prev](https://polygon.io/docs/get_v2_aggs_ticker__stocksTicker__prev_anchor) API.
     pub async fn stock_equities_previous_close(
         &self,
         stocks_ticker: &str,
@@ -297,31 +360,43 @@ impl RESTClient {
             .await
     }
 
+    /// Get the current minute, day, and previous day's aggregate, as well as
+    /// the last trade and quote for all traded stock symbols using the [/v2/snapshot/locale/{locale}/markets/{market}/tickers](https://polygon.io/docs/get_v2_snapshot_locale_us_markets_stocks_tickers_anchor) API.
     pub async fn stock_equities_snapshot_all_tickers(
         &self,
+        locale: &str,
+        market: &str,
         query_params: &HashMap<&str, &str>,
     ) -> Result<StockEquitiesSnapshotAllTickersResponse, reqwest::Error> {
-        let uri = format!("/v2/snapshot/locale/us/markets/stocks/tickers");
+        let uri = format!("/v2/snapshot/locale/{}/markets/{}/tickers", locale, market);
         self.send_request::<StockEquitiesSnapshotAllTickersResponse>(&uri, query_params)
             .await
     }
 
+    /// Get the current minute, day, and previous day's aggregate, as well as
+    /// the last trade and quote for a single traded stock ticker using the [/v2/snapshot/locale/{locale}/markets/{market}/tickers/{ticker}](https://polygon.io/docs/get_v2_snapshot_locale_us_markets_stocks_tickers__stocksTicker__anchor) API.
     pub async fn stock_equities_snapshot_single_ticker(
         &self,
+        locale: &str,
+        market: &str,
         ticker: &str,
         query_params: &HashMap<&str, &str>,
     ) -> Result<StockEquitiesSnapshotAllTickersResponse, reqwest::Error> {
-        let uri = format!("/v2/snapshot/locale/us/markets/stocks/tickers/{}", ticker);
+        let uri = format!("/v2/snapshot/locale/{}/markets/{}/tickers/{}", locale, market, ticker);
         self.send_request::<StockEquitiesSnapshotAllTickersResponse>(&uri, query_params)
             .await
     }
 
+    /// Get the current top 20 gainers or losers of the day in the
+    /// stocks/equities markets using the [/v2/snapshot/locale/{locale}/markets/{market}/{direction}](https://polygon.io/docs/get_v2_snapshot_locale_us_markets_stocks__direction__anchor) API.
     pub async fn stock_equities_snapshot_gainers_losers(
         &self,
+        locale: &str,
+        market: &str,
         direction: &str,
         query_params: &HashMap<&str, &str>,
     ) -> Result<StockEquitiesSnapshotGainersLosersResponse, reqwest::Error> {
-        let uri = format!("/v2/snapshot/locale/us/markets/stocks/{}", direction);
+        let uri = format!("/v2/snapshot/locale/{}/markets/{}/{}", locale, market, direction);
         self.send_request::<StockEquitiesSnapshotGainersLosersResponse>(&uri, query_params)
             .await
     }
@@ -330,6 +405,8 @@ impl RESTClient {
     // Crypto APIs
     //
 
+    /// Get a list of cryptocurrency exchanges which are supported by polygon.io
+    /// using the [/v1/meta/crypto-exchanges](https://polygon.io/docs/get_v1_meta_crypto-exchanges_anchor) API.
     pub async fn crypto_crypto_exchanges(
         &self,
         query_params: &HashMap<&str, &str>,
@@ -664,7 +741,7 @@ mod tests {
     fn test_stock_equities_snapshot_all_tickers() {
         let query_params = HashMap::new();
         let _resp = tokio_test::block_on(
-            RESTClient::new(None, None).stock_equities_snapshot_all_tickers(&query_params),
+            RESTClient::new(None, None).stock_equities_snapshot_all_tickers("us", "stocks", &query_params),
         )
         .unwrap();
     }
@@ -674,7 +751,7 @@ mod tests {
         let query_params = HashMap::new();
         let _resp = tokio_test::block_on(
             RESTClient::new(None, None)
-                .stock_equities_snapshot_gainers_losers("gainers", &query_params),
+                .stock_equities_snapshot_gainers_losers("us", "stocks", "gainers", &query_params),
         )
         .unwrap();
     }

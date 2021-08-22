@@ -4,7 +4,7 @@ use std::env;
 use chrono::prelude::*;
 use chrono::Duration;
 
-use polygon_client::client::Client;
+use polygon_client::rest::RESTClient;
 
 #[tokio::main]
 async fn main() {
@@ -17,7 +17,7 @@ async fn main() {
 
     let one_year_ago = (Local::now() - Duration::days(365)).date();
 
-    let client = Client::new(None, None);
+    let client = RESTClient::new(None, None);
 
     for ticker in args.iter() {
         let query_params = HashMap::new();

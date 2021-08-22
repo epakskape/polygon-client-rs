@@ -34,9 +34,12 @@ use crate::types::*;
 static DEFAULT_API_URL: &str = "https://api.polygon.io";
 
 pub struct RESTClient {
+    /// The API key to use for requests.
     pub auth_key: String,
+    /// The API URL to use for requests.
+    ///
+    /// The default API URL is <https://api.polygon.io>.
     pub api_url: String,
-    pub timeout: Option<u32>,
     client: reqwest::Client,
 }
 
@@ -47,11 +50,14 @@ impl RESTClient {
     /// authentication. If `None` is provided, then the API key specified in the
     /// `POLYGON_AUTH_KEY` environment variable is used.
     ///
+    /// The `timeout` parameter optionally provides the duration to wait for a
+    /// response to a request.
+    ///
     /// # Panics
     ///
     /// This function will panic if `auth_key` is `None` and the
     /// `POLYGON_AUTH_KEY` environment variable is not set then.
-    pub fn new(auth_key: Option<&str>, timeout: Option<u32>) -> Self {
+    pub fn new(auth_key: Option<&str>, timeout: Option<core::time::Duration>) -> Self {
         let api_url = match env::var("POLYGON_API_URL") {
             Ok(v) => v,
             _ => String::from(DEFAULT_API_URL),
@@ -65,11 +71,16 @@ impl RESTClient {
             },
         };
 
+        let mut client = reqwest::ClientBuilder::new();
+
+        if timeout.is_some() {
+            client = client.timeout(timeout.unwrap());
+        }
+
         RESTClient {
             auth_key: auth_key_actual,
             api_url: api_url,
-            timeout: timeout,
-            client: reqwest::Client::new(),
+            client: client.build().unwrap(),
         }
     }
 
@@ -382,7 +393,10 @@ impl RESTClient {
         ticker: &str,
         query_params: &HashMap<&str, &str>,
     ) -> Result<StockEquitiesSnapshotAllTickersResponse, reqwest::Error> {
-        let uri = format!("/v2/snapshot/locale/{}/markets/{}/tickers/{}", locale, market, ticker);
+        let uri = format!(
+            "/v2/snapshot/locale/{}/markets/{}/tickers/{}",
+            locale, market, ticker
+        );
         self.send_request::<StockEquitiesSnapshotAllTickersResponse>(&uri, query_params)
             .await
     }
@@ -396,7 +410,10 @@ impl RESTClient {
         direction: &str,
         query_params: &HashMap<&str, &str>,
     ) -> Result<StockEquitiesSnapshotGainersLosersResponse, reqwest::Error> {
-        let uri = format!("/v2/snapshot/locale/{}/markets/{}/{}", locale, market, direction);
+        let uri = format!(
+            "/v2/snapshot/locale/{}/markets/{}/{}",
+            locale, market, direction
+        );
         self.send_request::<StockEquitiesSnapshotGainersLosersResponse>(&uri, query_params)
             .await
     }
@@ -741,7 +758,11 @@ mod tests {
     fn test_stock_equities_snapshot_all_tickers() {
         let query_params = HashMap::new();
         let _resp = tokio_test::block_on(
-            RESTClient::new(None, None).stock_equities_snapshot_all_tickers("us", "stocks", &query_params),
+            RESTClient::new(None, None).stock_equities_snapshot_all_tickers(
+                "us",
+                "stocks",
+                &query_params,
+            ),
         )
         .unwrap();
     }
@@ -750,8 +771,12 @@ mod tests {
     fn test_stock_equities_snapshot_gainers_losers() {
         let query_params = HashMap::new();
         let _resp = tokio_test::block_on(
-            RESTClient::new(None, None)
-                .stock_equities_snapshot_gainers_losers("us", "stocks", "gainers", &query_params),
+            RESTClient::new(None, None).stock_equities_snapshot_gainers_losers(
+                "us",
+                "stocks",
+                "gainers",
+                &query_params,
+            ),
         )
         .unwrap();
     }

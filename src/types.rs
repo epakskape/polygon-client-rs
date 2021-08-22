@@ -16,12 +16,12 @@ pub struct ReferenceTickersResponseTickerV3 {
     pub locale: String,
     pub primary_exchange: String,
     #[serde(rename = "type")]
-    pub ticker_type: String,
+    pub ticker_type: Option<String>,
     pub active: bool,
     pub currency_name: String,
-    pub cik: String,
-    pub composite_figi: String,
-    pub share_class_figi: String,
+    pub cik: Option<String>,
+    pub composite_figi: Option<String>,
+    pub share_class_figi: Option<String>,
     pub last_updated_utc: String,
 }
 

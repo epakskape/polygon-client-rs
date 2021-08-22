@@ -1,3 +1,24 @@
+//! REST client for [polygon.io](https://polygon.io).
+//!
+//! # Example
+//!
+//! ```
+//! use std::collections::HashMap;
+//! use polygon_client::rest::RESTClient;
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     let client = RESTClient::new(None, None);
+//!     let query_params = HashMap::new();
+//!     let resp = client.reference_tickers(&query_params)
+//!         .await
+//!         .expect("failed to query tickers");
+//!     for res in resp.results {
+//!         println!("ticker: {}", res.ticker);
+//!     }
+//! }
+//! ```
+//!
 use std::collections::HashMap;
 use std::env;
 
@@ -332,7 +353,8 @@ mod tests {
         let mut query_params = HashMap::new();
         query_params.insert("ticker", "MSFT");
         let resp =
-            tokio_test::block_on(RESTClient::new(None, None).reference_tickers(&query_params)).unwrap();
+            tokio_test::block_on(RESTClient::new(None, None).reference_tickers(&query_params))
+                .unwrap();
         assert_eq!(resp.status, "OK");
         assert_eq!(resp.count, 1);
         assert_eq!(resp.results[0].market, "stocks");
@@ -387,7 +409,8 @@ mod tests {
     fn test_reference_markets() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(RESTClient::new(None, None).reference_markets(&query_params)).unwrap();
+            tokio_test::block_on(RESTClient::new(None, None).reference_markets(&query_params))
+                .unwrap();
         assert_eq!(resp.status, "OK");
         let bond = resp.results.iter().find(|x| x.market == "BONDS");
         assert_eq!(bond.is_some(), true);
@@ -398,7 +421,8 @@ mod tests {
     fn test_reference_locales() {
         let query_params = HashMap::new();
         let resp =
-            tokio_test::block_on(RESTClient::new(None, None).reference_locales(&query_params)).unwrap();
+            tokio_test::block_on(RESTClient::new(None, None).reference_locales(&query_params))
+                .unwrap();
         assert_eq!(resp.status, "OK");
         let bond = resp.results.iter().find(|x| x.locale == "US");
         assert_eq!(bond.is_some(), true);
@@ -483,27 +507,30 @@ mod tests {
     #[test]
     fn test_reference_market_holidays() {
         let query_params = HashMap::new();
-        let resp =
-            tokio_test::block_on(RESTClient::new(None, None).reference_market_holidays(&query_params))
-                .unwrap();
+        let resp = tokio_test::block_on(
+            RESTClient::new(None, None).reference_market_holidays(&query_params),
+        )
+        .unwrap();
         assert_ne!(resp.len(), 0);
     }
 
     #[test]
     fn test_reference_market_status() {
         let query_params = HashMap::new();
-        let resp =
-            tokio_test::block_on(RESTClient::new(None, None).reference_market_status(&query_params))
-                .unwrap();
+        let resp = tokio_test::block_on(
+            RESTClient::new(None, None).reference_market_status(&query_params),
+        )
+        .unwrap();
         assert_ne!(resp.exchanges.len(), 0);
     }
 
     #[test]
     fn test_stock_equities_exchanges() {
         let query_params = HashMap::new();
-        let resp =
-            tokio_test::block_on(RESTClient::new(None, None).stock_equities_exchanges(&query_params))
-                .unwrap();
+        let resp = tokio_test::block_on(
+            RESTClient::new(None, None).stock_equities_exchanges(&query_params),
+        )
+        .unwrap();
         assert_ne!(resp.len(), 0);
         let dji = resp
             .iter()
@@ -539,7 +566,8 @@ mod tests {
     fn test_stock_equities_last_quote_for_a_symbol() {
         let query_params = HashMap::new();
         let resp = tokio_test::block_on(
-            RESTClient::new(None, None).stock_equities_last_quote_for_a_symbol("MSFT", &query_params),
+            RESTClient::new(None, None)
+                .stock_equities_last_quote_for_a_symbol("MSFT", &query_params),
         )
         .unwrap();
         assert_eq!(resp.results.T.unwrap(), "MSFT");
@@ -548,12 +576,13 @@ mod tests {
     #[test]
     fn test_stock_equities_daily_open_close() {
         let query_params = HashMap::new();
-        let resp = tokio_test::block_on(RESTClient::new(None, None).stock_equities_daily_open_close(
-            "MSFT",
-            "2020-10-14",
-            &query_params,
-        ))
-        .unwrap();
+        let resp =
+            tokio_test::block_on(RESTClient::new(None, None).stock_equities_daily_open_close(
+                "MSFT",
+                "2020-10-14",
+                &query_params,
+            ))
+            .unwrap();
         assert_eq!(resp.symbol, "MSFT");
         assert_eq!(resp.status, "OK");
         assert_eq!(resp.open, 223f64);
@@ -653,9 +682,10 @@ mod tests {
     #[test]
     fn test_crypto_crypto_exchanges() {
         let query_params = HashMap::new();
-        let resp =
-            tokio_test::block_on(RESTClient::new(None, None).crypto_crypto_exchanges(&query_params))
-                .unwrap();
+        let resp = tokio_test::block_on(
+            RESTClient::new(None, None).crypto_crypto_exchanges(&query_params),
+        )
+        .unwrap();
         assert_ne!(resp.len(), 0);
         let coinbase = resp.iter().find(|x| x.name == "Coinbase");
         assert_eq!(coinbase.is_some(), true);

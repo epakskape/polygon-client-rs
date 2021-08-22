@@ -1,3 +1,4 @@
+//! Data types associated with the REST interfaces.
 use serde;
 use serde::Deserialize;
 

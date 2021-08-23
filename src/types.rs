@@ -1096,7 +1096,7 @@ pub struct ForexCurrenciesAggregatesResponse {
     pub results: Vec<ForexEquitiesAggregates>,
     pub status: String,
     pub request_id: String,
-    pub count: u32
+    pub count: u32,
 }
 
 //
@@ -1113,7 +1113,7 @@ pub struct ForexCurrenciesGroupedDailyResponse {
     pub results: Vec<ForexEquitiesAggregates>,
     pub status: String,
     pub request_id: String,
-    pub count: u32
+    pub count: u32,
 }
 
 //
@@ -1131,5 +1131,98 @@ pub struct ForexCurrenciesPreviousCloseResponse {
     pub results: Vec<ForexEquitiesAggregates>,
     pub status: String,
     pub request_id: String,
-    pub count: u32
+    pub count: u32,
+}
+
+//
+// v1/open-close/crypto/{from}/{to}/{date}
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct CryptoOpenTrades {
+    pub x: u32,
+    pub p: f64,
+    pub s: f64,
+    pub c: Vec<u32>,
+    pub i: String,
+    pub t: u64,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct CryptoDailyOpenCloseResponse {
+    pub symbol: String,
+    #[serde(rename = "isUTC")]
+    pub is_utc: bool,
+    pub day: String,
+    pub open: f64,
+    pub close: f64,
+    #[serde(rename = "openTrades")]
+    pub open_trades: Vec<CryptoOpenTrades>,
+}
+
+
+//
+// v2/aggs/ticker/{cryptoTicker}/range/{multiplier}/{timespan}/{from}/{to}
+//
+
+#[allow(non_snake_case)]
+#[derive(Clone, Deserialize, Debug)]
+pub struct CryptoAggregates {
+    pub T: Option<String>,
+    pub c: f64,
+    pub h: f64,
+    pub l: f64,
+    pub n: Option<f64>,
+    pub o: f64,
+    pub t: Option<u64>,
+    pub v: f64,
+    pub vw: Option<f64>,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct CryptoAggregatesResponse {
+    pub ticker: String,
+    #[serde(rename = "queryCount")]
+    pub query_count: u32,
+    #[serde(rename = "resultsCount")]
+    pub results_count: u32,
+    pub results: Vec<CryptoAggregates>,
+    pub status: String,
+    pub request_id: String,
+    pub count: u32,
+}
+
+//
+// v2/aggs/grouped/locale/global/market/crypto/{date}
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct CryptoGroupedDailyResponse {
+    #[serde(rename = "queryCount")]
+    pub query_count: u32,
+    #[serde(rename = "resultsCount")]
+    pub results_count: u32,
+    pub adjusted: bool,
+    pub results: Vec<CryptoAggregates>,
+    pub status: String,
+    pub request_id: String,
+    pub count: u32,
+}
+
+//
+// v2/aggs/ticker/{crypto_ticker}/prev
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct CryptoPreviousCloseResponse {
+    pub ticker: String,
+    #[serde(rename = "queryCount")]
+    pub query_count: u32,
+    #[serde(rename = "resultsCount")]
+    pub results_count: u32,
+    pub adjusted: bool,
+    pub results: Vec<CryptoAggregates>,
+    pub status: String,
+    pub request_id: String,
+    pub count: u32,
 }

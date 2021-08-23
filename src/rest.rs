@@ -428,7 +428,7 @@ impl RESTClient {
         timespan: &str,
         from: &str,
         to: &str,
-        query_params: &HashMap<&str, &str>
+        query_params: &HashMap<&str, &str>,
     ) -> Result<ForexCurrenciesAggregatesResponse, reqwest::Error> {
         let uri = format!(
             "/v2/aggs/ticker/{}/range/{}/{}/{}/{}",
@@ -443,12 +443,9 @@ impl RESTClient {
     pub async fn forex_currencies_grouped_daily(
         &self,
         date: &str,
-        query_params: &HashMap<&str, &str>
+        query_params: &HashMap<&str, &str>,
     ) -> Result<ForexCurrenciesGroupedDailyResponse, reqwest::Error> {
-        let uri = format!(
-            "/v2/aggs/grouped/locale/global/market/fx/{}", 
-            date
-        );
+        let uri = format!("/v2/aggs/grouped/locale/global/market/fx/{}", date);
         self.send_request::<ForexCurrenciesGroupedDailyResponse>(&uri, query_params)
             .await
     }
@@ -458,12 +455,9 @@ impl RESTClient {
     pub async fn forex_currencies_previous_close(
         &self,
         forex_ticker: &str,
-        query_params: &HashMap<&str, &str>
+        query_params: &HashMap<&str, &str>,
     ) -> Result<ForexCurrenciesPreviousCloseResponse, reqwest::Error> {
-        let uri = format!(
-            "/v2/aggs/ticker/{}/prev",
-            forex_ticker
-        );
+        let uri = format!("/v2/aggs/ticker/{}/prev", forex_ticker);
         self.send_request::<ForexCurrenciesPreviousCloseResponse>(&uri, query_params)
             .await
     }
@@ -483,6 +477,63 @@ impl RESTClient {
             query_params,
         )
         .await
+    }
+
+    /// Get the open and close prices of a cryptocurrency symbol on a certain day
+    /// using [/v1/open-close/crypto/{from}/{to}/{date}](https://polygon.io/docs/get_v1_open-close_crypto__from___to___date__anchor) API.
+    pub async fn crypto_daily_open_close(
+        &self,
+        from: &str,
+        to: &str,
+        date: &str,
+        query_params: &HashMap<&str, &str>,
+    ) -> Result<CryptoDailyOpenCloseResponse, reqwest::Error> {
+        let uri = format!("/v1/open-close/crypto/{}/{}/{}", from, to, date);
+        self.send_request::<CryptoDailyOpenCloseResponse>(&uri, query_params)
+            .await
+    }
+
+    /// Get aggregate bars for a cryptocurrency over a given date range in custom
+    /// time window sizes using the [/v2/aggs/ticker/{cryptoTicker}/range/{multiplier}/{timespan}/{from}/{to}](https://polygon.io/docs/get_v2_aggs_ticker__cryptoTicker__range__multiplier___timespan___from___to__anchor) API.
+    pub async fn crypto_aggregates(
+        &self,
+        crypto_ticker: &str,
+        multiplier: u32,
+        timespan: &str,
+        from: &str,
+        to: &str,
+        query_params: &HashMap<&str, &str>,
+    ) -> Result<CryptoAggregatesResponse, reqwest::Error> {
+        let uri = format!(
+            "/v2/aggs/ticker/{}/range/{}/{}/{}/{}",
+            crypto_ticker, multiplier, timespan, from, to
+        );
+        self.send_request::<CryptoAggregatesResponse>(&uri, query_params)
+            .await
+    }
+
+    /// Get the daily open, high, low, and close for the entire crypto markets
+    /// using the [/v2/aggs/grouped/locale/global/market/crypto/{date}](https://polygon.io/docs/get_v2_aggs_grouped_locale_global_market_crypto__date__anchor) API.
+    pub async fn crypto_grouped_daily(
+        &self,
+        date: &str,
+        query_params: &HashMap<&str, &str>,
+    ) -> Result<CryptoGroupedDailyResponse, reqwest::Error> {
+        let uri = format!("/v2/aggs/grouped/locale/global/market/crypto/{}", date);
+        self.send_request::<CryptoGroupedDailyResponse>(&uri, query_params)
+            .await
+    }
+
+    /// Get the previous day's open, high, low, and close for the specified
+    /// cryptocurrency using the [/v2/aggs/ticker/{crypto_ticker}/prev](https://polygon.io/docs/get_v2_aggs_ticker__cryptoTicker__prev_anchor) API.
+    pub async fn crypto_previous_close(
+        &self,
+        crypto_ticker: &str,
+        query_params: &HashMap<&str, &str>,
+    ) -> Result<CryptoPreviousCloseResponse, reqwest::Error> {
+        let uri = format!("/v2/aggs/ticker/{}/prev", crypto_ticker);
+        self.send_request::<CryptoPreviousCloseResponse>(&uri, query_params)
+            .await
     }
 }
 
@@ -808,10 +859,7 @@ mod tests {
     fn test_stock_equities_snapshot_all_tickers() {
         let query_params = HashMap::new();
         let _resp = tokio_test::block_on(
-            RESTClient::new(None, None).stock_equities_snapshot_all_tickers(
-                "us",
-                &query_params,
-            ),
+            RESTClient::new(None, None).stock_equities_snapshot_all_tickers("us", &query_params),
         )
         .unwrap();
     }
@@ -871,10 +919,9 @@ mod tests {
     #[test]
     fn test_forex_currencies_grouped_daily() {
         let query_params = HashMap::new();
-        let resp = tokio_test::block_on(RESTClient::new(None, None).forex_currencies_grouped_daily(
-            "2020-10-14",
-            &query_params,
-        ))
+        let resp = tokio_test::block_on(
+            RESTClient::new(None, None).forex_currencies_grouped_daily("2020-10-14", &query_params),
+        )
         .unwrap();
         assert_eq!(resp.status, "OK");
         let msft = resp
@@ -905,5 +952,83 @@ mod tests {
         assert_eq!(result.unwrap().T.as_ref().unwrap(), "C:EURUSD");
     }
 
+    #[test]
+    fn test_crypto_daily_open_close() {
+        let mut query_params = HashMap::new();
+        query_params.insert("adjusted", "true");
+        let resp = tokio_test::block_on(RESTClient::new(None, None).crypto_daily_open_close(
+            "BTC",
+            "USD",
+            "2020-10-14",
+            &query_params,
+        ))
+        .unwrap();
+        assert_eq!(resp.symbol, "BTC-USD");
+        assert_eq!(resp.is_utc, true);
+        assert_eq!(resp.open, 11443f64);
+        assert_eq!(resp.close, 11427.7);
+    }
+
+    #[test]
+    fn test_crypto_aggregates() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(RESTClient::new(None, None).crypto_aggregates(
+            "X:BTCUSD",
+            1,
+            "day",
+            "2020-10-14",
+            "2020-10-14",
+            &query_params,
+        ))
+        .unwrap();
+        assert_eq!(resp.ticker, "X:BTCUSD");
+        assert_eq!(resp.status, "OK");
+        assert_eq!(resp.query_count, 1);
+        assert_eq!(resp.results_count, 1);
+        let result = resp.results.first().unwrap();
+        assert_eq!(result.vw.unwrap(), 11405.5019);
+        assert_eq!(result.o, 11443f64);
+        assert_eq!(result.c, 11427.7);
+        assert_eq!(result.h, 11564f64);
+        assert_eq!(result.l, 11284.27);
+        assert_eq!(result.t.unwrap(), 1602633600000);
+        assert_eq!(result.n.unwrap(), 142439f64);
+    }
+
+    #[test]
+    fn test_crypto_grouped_daily() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            RESTClient::new(None, None).crypto_grouped_daily("2020-10-14", &query_params),
+        )
+        .unwrap();
+        assert_eq!(resp.status, "OK");
+        let msft = resp
+            .results
+            .iter()
+            .find(|x| x.T.is_some() && x.T.as_ref().unwrap() == "X:LTCUSD");
+        assert_eq!(msft.is_some(), true);
+        assert_eq!(msft.unwrap().vw.is_some(), true);
+        assert_eq!(msft.unwrap().vw.unwrap(), 50.1376);
+        assert_eq!(msft.unwrap().o, 49.981);
+        assert_eq!(msft.unwrap().h, 51.095);
+        assert_eq!(msft.unwrap().l, 49.2427);
+    }
+
+    #[test]
+    fn test_crypto_previous_close() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            RESTClient::new(None, None).crypto_previous_close("X:BTCUSD", &query_params),
+        )
+        .unwrap();
+        assert_eq!(resp.ticker, "X:BTCUSD");
+        assert_eq!(resp.status, "OK");
+        assert_eq!(resp.results_count, 1);
+        let result = resp.results.first();
+        assert_eq!(result.is_some(), true);
+        assert_eq!(result.unwrap().T.is_some(), true);
+        assert_eq!(result.unwrap().T.as_ref().unwrap(), "X:BTCUSD");
+    }
 
 }

@@ -1067,3 +1067,33 @@ pub struct StockEquitiesSnapshotGainersLosersResponse {
     pub status: String,
     pub tickers: Vec<StockEquitiesTickerSnapshot>,
 }
+
+//
+// v2/aggs/ticker/{ticker}/range/{multiplier}/{timespan}/{from}/{to}
+//
+
+#[allow(non_snake_case)]
+#[derive(Clone, Deserialize, Debug)]
+pub struct ForexEquitiesAggregates {
+    pub c: f64,
+    pub h: f64,
+    pub l: f64,
+    pub n: Option<f64>,
+    pub o: f64,
+    pub t: Option<u64>,
+    pub v: f64,
+    pub vw: Option<f64>,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct ForexCurrenciesAggregatesResponse {
+    pub ticker: String,
+    #[serde(rename = "queryCount")]
+    pub query_count: u32,
+    #[serde(rename = "resultsCount")]
+    pub results_count: u32,
+    pub results: Vec<ForexEquitiesAggregates>,
+    pub status: String,
+    pub request_id: String,
+    pub count: u32
+}

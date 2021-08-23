@@ -419,6 +419,27 @@ impl RESTClient {
     }
 
     //
+    // Forex APIs
+    //
+
+    pub async fn forex_currencies_aggregates(
+        &self,
+        forex_ticker: &str,
+        multiplier: u32,
+        timespan: &str,
+        from: &str,
+        to: &str,
+        query_params: &HashMap<&str, &str>
+    ) -> Result<ForexCurrenciesAggregatesResponse, reqwest::Error> {
+        let uri = format!(
+            "/v2/aggs/ticker/{}/range/{}/{}/{}/{}",
+            forex_ticker, multiplier, timespan, from, to
+        );
+        self.send_request::<ForexCurrenciesAggregatesResponse>(&uri, query_params)
+            .await
+    }
+
+    //
     // Crypto APIs
     //
 
@@ -791,5 +812,32 @@ mod tests {
         assert_ne!(resp.len(), 0);
         let coinbase = resp.iter().find(|x| x.name == "Coinbase");
         assert_eq!(coinbase.is_some(), true);
+    }
+
+    #[test]
+    fn test_forex_currencies_aggregates() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(RESTClient::new(None, None).forex_currencies_aggregates(
+            "C:EURUSD",
+            1,
+            "day",
+            "2020-10-14",
+            "2020-10-14",
+            &query_params,
+        ))
+        .unwrap();
+        assert_eq!(resp.ticker, "C:EURUSD");
+        assert_eq!(resp.status, "OK");
+        assert_eq!(resp.query_count, 1);
+        assert_eq!(resp.results_count, 1);
+        let result = resp.results.first().unwrap();
+        assert_eq!(result.v, 211796f64);
+        assert_eq!(result.vw.unwrap(), 1.1748);
+        assert_eq!(result.o, 1.17439);
+        assert_eq!(result.c, 1.17496);
+        assert_eq!(result.h, 1.1771);
+        assert_eq!(result.l, 1.17198);
+        assert_eq!(result.t.unwrap(), 1602633600000);
+        assert_eq!(result.n.unwrap(), 211796f64);
     }
 }

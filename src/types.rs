@@ -1116,3 +1116,20 @@ pub struct ForexCurrenciesGroupedDailyResponse {
     pub count: u32
 }
 
+//
+// v2/aggs/ticker/{forex_ticker}/prev
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct ForexCurrenciesPreviousCloseResponse {
+    pub ticker: String,
+    #[serde(rename = "queryCount")]
+    pub query_count: u32,
+    #[serde(rename = "resultsCount")]
+    pub results_count: u32,
+    pub adjusted: bool,
+    pub results: Vec<ForexEquitiesAggregates>,
+    pub status: String,
+    pub request_id: String,
+    pub count: u32
+}

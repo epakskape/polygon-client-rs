@@ -439,7 +439,7 @@ impl RESTClient {
     }
 
     /// Get the daily open, high, low, and close for the entire forex markets
-    /// using the [/v2/aggs/grouped/locale/global/market/fx/{date}] API.
+    /// using the [/v2/aggs/grouped/locale/global/market/fx/{date}](https://polygon.io/docs/get_v2_aggs_grouped_locale_global_market_fx__date__anchor) API.
     pub async fn forex_currencies_grouped_daily(
         &self,
         date: &str,
@@ -453,6 +453,20 @@ impl RESTClient {
             .await
     }
 
+    /// Get the previous day's open, high, low, and close for the specified
+    /// forex pair using the [/v2/aggs/ticker/{forex_ticker}/prev](https://polygon.io/docs/get_v2_aggs_ticker__forexTicker__prev_anchor) API.
+    pub async fn forex_currencies_previous_close(
+        &self,
+        forex_ticker: &str,
+        query_params: &HashMap<&str, &str>
+    ) -> Result<ForexCurrenciesPreviousCloseResponse, reqwest::Error> {
+        let uri = format!(
+            "/v2/aggs/ticker/{}/prev",
+            forex_ticker
+        );
+        self.send_request::<ForexCurrenciesPreviousCloseResponse>(&uri, query_params)
+            .await
+    }
 
     //
     // Crypto APIs
@@ -873,6 +887,22 @@ mod tests {
         assert_eq!(msft.unwrap().o, 45.37);
         assert_eq!(msft.unwrap().h, 45.59);
         assert_eq!(msft.unwrap().l, 44.83);
+    }
+
+    #[test]
+    fn test_forex_currencies_previous_close() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(
+            RESTClient::new(None, None).forex_currencies_previous_close("C:EURUSD", &query_params),
+        )
+        .unwrap();
+        assert_eq!(resp.ticker, "C:EURUSD");
+        assert_eq!(resp.status, "OK");
+        assert_eq!(resp.results_count, 1);
+        let result = resp.results.first();
+        assert_eq!(result.is_some(), true);
+        assert_eq!(result.unwrap().T.is_some(), true);
+        assert_eq!(result.unwrap().T.as_ref().unwrap(), "C:EURUSD");
     }
 
 

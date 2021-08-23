@@ -1075,6 +1075,7 @@ pub struct StockEquitiesSnapshotGainersLosersResponse {
 #[allow(non_snake_case)]
 #[derive(Clone, Deserialize, Debug)]
 pub struct ForexEquitiesAggregates {
+    pub T: Option<String>,
     pub c: f64,
     pub h: f64,
     pub l: f64,
@@ -1097,3 +1098,21 @@ pub struct ForexCurrenciesAggregatesResponse {
     pub request_id: String,
     pub count: u32
 }
+
+//
+// v2/aggs/grouped/locale/global/market/fx/{date}
+//
+
+#[derive(Clone, Deserialize, Debug)]
+pub struct ForexCurrenciesGroupedDailyResponse {
+    #[serde(rename = "queryCount")]
+    pub query_count: u32,
+    #[serde(rename = "resultsCount")]
+    pub results_count: u32,
+    pub adjusted: bool,
+    pub results: Vec<ForexEquitiesAggregates>,
+    pub status: String,
+    pub request_id: String,
+    pub count: u32
+}
+

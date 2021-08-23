@@ -376,43 +376,40 @@ impl RESTClient {
     pub async fn stock_equities_snapshot_all_tickers(
         &self,
         locale: &str,
-        market: &str,
         query_params: &HashMap<&str, &str>,
     ) -> Result<StockEquitiesSnapshotAllTickersResponse, reqwest::Error> {
-        let uri = format!("/v2/snapshot/locale/{}/markets/{}/tickers", locale, market);
+        let uri = format!("/v2/snapshot/locale/{}/markets/stocks/tickers", locale);
         self.send_request::<StockEquitiesSnapshotAllTickersResponse>(&uri, query_params)
             .await
     }
 
     /// Get the current minute, day, and previous day's aggregate, as well as
-    /// the last trade and quote for a single traded stock ticker using the [/v2/snapshot/locale/{locale}/markets/{market}/tickers/{ticker}](https://polygon.io/docs/get_v2_snapshot_locale_us_markets_stocks_tickers__stocksTicker__anchor) API.
+    /// the last trade and quote for a single traded stock ticker using the [/v2/snapshot/locale/{locale}/markets/stocks/tickers/{ticker}](https://polygon.io/docs/get_v2_snapshot_locale_us_markets_stocks_tickers__stocksTicker__anchor) API.
     pub async fn stock_equities_snapshot_single_ticker(
         &self,
         locale: &str,
-        market: &str,
         ticker: &str,
         query_params: &HashMap<&str, &str>,
     ) -> Result<StockEquitiesSnapshotAllTickersResponse, reqwest::Error> {
         let uri = format!(
-            "/v2/snapshot/locale/{}/markets/{}/tickers/{}",
-            locale, market, ticker
+            "/v2/snapshot/locale/{}/markets/stocks/tickers/{}",
+            locale, ticker
         );
         self.send_request::<StockEquitiesSnapshotAllTickersResponse>(&uri, query_params)
             .await
     }
 
     /// Get the current top 20 gainers or losers of the day in the
-    /// stocks/equities markets using the [/v2/snapshot/locale/{locale}/markets/{market}/{direction}](https://polygon.io/docs/get_v2_snapshot_locale_us_markets_stocks__direction__anchor) API.
+    /// stocks/equities markets using the [/v2/snapshot/locale/{locale}/markets/stocks/{direction}](https://polygon.io/docs/get_v2_snapshot_locale_us_markets_stocks__direction__anchor) API.
     pub async fn stock_equities_snapshot_gainers_losers(
         &self,
         locale: &str,
-        market: &str,
         direction: &str,
         query_params: &HashMap<&str, &str>,
     ) -> Result<StockEquitiesSnapshotGainersLosersResponse, reqwest::Error> {
         let uri = format!(
-            "/v2/snapshot/locale/{}/markets/{}/{}",
-            locale, market, direction
+            "/v2/snapshot/locale/{}/markets/stocks/{}",
+            locale, direction
         );
         self.send_request::<StockEquitiesSnapshotGainersLosersResponse>(&uri, query_params)
             .await
@@ -422,6 +419,8 @@ impl RESTClient {
     // Forex APIs
     //
 
+    /// Get aggregate bars for a forex pair over a given date range in custom
+    /// time window sizes using the [/v2/aggs/ticker/{forexTicker}/range/{multiplier}/{timespan}/{from}/{to}](https://polygon.io/docs/get_v2_aggs_ticker__forexTicker__range__multiplier___timespan___from___to__anchor) API.
     pub async fn forex_currencies_aggregates(
         &self,
         forex_ticker: &str,
@@ -438,6 +437,22 @@ impl RESTClient {
         self.send_request::<ForexCurrenciesAggregatesResponse>(&uri, query_params)
             .await
     }
+
+    /// Get the daily open, high, low, and close for the entire forex markets
+    /// using the [/v2/aggs/grouped/locale/global/market/fx/{date}] API.
+    pub async fn forex_currencies_grouped_daily(
+        &self,
+        date: &str,
+        query_params: &HashMap<&str, &str>
+    ) -> Result<ForexCurrenciesGroupedDailyResponse, reqwest::Error> {
+        let uri = format!(
+            "/v2/aggs/grouped/locale/global/market/fx/{}", 
+            date
+        );
+        self.send_request::<ForexCurrenciesGroupedDailyResponse>(&uri, query_params)
+            .await
+    }
+
 
     //
     // Crypto APIs
@@ -781,7 +796,6 @@ mod tests {
         let _resp = tokio_test::block_on(
             RESTClient::new(None, None).stock_equities_snapshot_all_tickers(
                 "us",
-                "stocks",
                 &query_params,
             ),
         )
@@ -794,7 +808,6 @@ mod tests {
         let _resp = tokio_test::block_on(
             RESTClient::new(None, None).stock_equities_snapshot_gainers_losers(
                 "us",
-                "stocks",
                 "gainers",
                 &query_params,
             ),
@@ -840,4 +853,27 @@ mod tests {
         assert_eq!(result.t.unwrap(), 1602633600000);
         assert_eq!(result.n.unwrap(), 211796f64);
     }
+
+    #[test]
+    fn test_forex_currencies_grouped_daily() {
+        let query_params = HashMap::new();
+        let resp = tokio_test::block_on(RESTClient::new(None, None).forex_currencies_grouped_daily(
+            "2020-10-14",
+            &query_params,
+        ))
+        .unwrap();
+        assert_eq!(resp.status, "OK");
+        let msft = resp
+            .results
+            .iter()
+            .find(|x| x.T.is_some() && x.T.as_ref().unwrap() == "C:EURMUR");
+        assert_eq!(msft.is_some(), true);
+        assert_eq!(msft.unwrap().vw.is_some(), true);
+        assert_eq!(msft.unwrap().vw.unwrap(), 45.2081);
+        assert_eq!(msft.unwrap().o, 45.37);
+        assert_eq!(msft.unwrap().h, 45.59);
+        assert_eq!(msft.unwrap().l, 44.83);
+    }
+
+
 }

@@ -1160,7 +1160,6 @@ pub struct CryptoDailyOpenCloseResponse {
     pub open_trades: Vec<CryptoOpenTrades>,
 }
 
-
 //
 // v2/aggs/ticker/{cryptoTicker}/range/{multiplier}/{timespan}/{from}/{to}
 //

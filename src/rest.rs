@@ -1030,5 +1030,4 @@ mod tests {
         assert_eq!(result.unwrap().T.is_some(), true);
         assert_eq!(result.unwrap().T.as_ref().unwrap(), "X:BTCUSD");
     }
-
 }

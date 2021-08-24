@@ -25,8 +25,8 @@ use url::Url;
 use serde;
 use serde::Deserialize;
 
-use tungstenite::{Message, WebSocket};
 use tungstenite::client::connect;
+use tungstenite::{Message, WebSocket};
 
 pub const STOCKS_CLUSTER: &str = "stocks";
 pub const FOREX_CLUSTER: &str = "forex";
@@ -36,12 +36,12 @@ pub const CRYPTO_CLUSTER: &str = "crypto";
 struct ConnectedMessage {
     pub ev: String,
     pub status: String,
-    pub message: String
+    pub message: String,
 }
 
 pub struct WebSocketClient {
     pub auth_key: String,
-    websocket: WebSocket<tungstenite::stream::MaybeTlsStream<std::net::TcpStream>>
+    websocket: WebSocket<tungstenite::stream::MaybeTlsStream<std::net::TcpStream>>,
 }
 
 static DEFAULT_WS_HOST: &str = "wss://socket.polygon.io";
@@ -58,13 +58,11 @@ impl WebSocketClient {
 
         let url_str = format!("{}/{}", DEFAULT_WS_HOST, cluster);
         let url = Url::parse(&url_str).unwrap();
-        let sock = connect(url)
-            .expect("failed to connect")
-            .0;
+        let sock = connect(url).expect("failed to connect").0;
 
-        let mut wsc = WebSocketClient { 
+        let mut wsc = WebSocketClient {
             auth_key: auth_key_actual,
-            websocket: sock
+            websocket: sock,
         };
 
         wsc._authenticate();
@@ -74,19 +72,25 @@ impl WebSocketClient {
 
     fn _authenticate(&mut self) {
         let str = format!("{{\"action\":\"auth\",\"params\":\"{}\"}}", self.auth_key);
-        self.websocket.write_message(Message::Text(str.into())).expect("failed to authenticate");
+        self.websocket
+            .write_message(Message::Text(str.into()))
+            .expect("failed to authenticate");
     }
 
     pub fn subscribe(&mut self, params: &Vec<&str>) {
         let str = params.join(",");
         let msg = format!("{{\"action\":\"subscribe\",\"params\":\"{}\"}}", &str);
-        self.websocket.write_message(Message::Text(msg.into())).expect("failed to subscribe");
+        self.websocket
+            .write_message(Message::Text(msg.into()))
+            .expect("failed to subscribe");
     }
-    
+
     pub fn unsubscribe(&mut self, params: &Vec<&str>) {
         let str = params.join(",");
         let msg = format!("{{\"action\":\"unsubscribe\",\"params\":\"{}\"}}", &str);
-        self.websocket.write_message(Message::Text(msg.into())).expect("failed to unsubscribe");
+        self.websocket
+            .write_message(Message::Text(msg.into()))
+            .expect("failed to unsubscribe");
     }
 
     pub fn receive(&mut self) -> tungstenite::error::Result<Message> {
@@ -103,7 +107,7 @@ mod tests {
     #[test]
     fn test_subscribe() {
         let mut socket = WebSocketClient::new(STOCKS_CLUSTER, None);
-        let params = vec! ["T.MSFT"];
+        let params = vec!["T.MSFT"];
         socket.subscribe(&params);
     }
 

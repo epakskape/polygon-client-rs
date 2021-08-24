@@ -55,7 +55,7 @@ impl RESTClient {
     /// # Panics
     ///
     /// This function will panic if `auth_key` is `None` and the
-    /// `POLYGON_AUTH_KEY` environment variable is not set then.
+    /// `POLYGON_AUTH_KEY` environment variable is not set.
     pub fn new(auth_key: Option<&str>, timeout: Option<core::time::Duration>) -> Self {
         let api_url = match env::var("POLYGON_API_URL") {
             Ok(v) => v,

@@ -47,6 +47,19 @@ pub struct WebSocketClient {
 static DEFAULT_WS_HOST: &str = "wss://socket.polygon.io";
 
 impl WebSocketClient {
+    /// Returns a new WebSocket client.
+    ///
+    /// The `cluster` parameter can be one of `STOCKS_CLUSTER`, `FOREX_CLUSTER`,
+    /// or `CRYPTO_CLUSTER`.
+    /// 
+    /// The `auth_key` parameter optionally provides the API key to use for
+    /// authentication. If `None` is provided, then the API key specified in the 
+    /// `POLYGON_AUTH_KEY` environment variable is used.
+    /// 
+    /// # Panics
+    ///
+    /// This function will panic if `auth_key` is `None` and the
+    /// `POLYGON_AUTH_KEY` environment variable is not set.
     pub fn new(cluster: &str, auth_key: Option<&str>) -> Self {
         let auth_key_actual = match auth_key {
             Some(v) => String::from(v),
@@ -77,6 +90,7 @@ impl WebSocketClient {
             .expect("failed to authenticate");
     }
 
+    /// Subscribes to one or more ticker.
     pub fn subscribe(&mut self, params: &Vec<&str>) {
         let str = params.join(",");
         let msg = format!("{{\"action\":\"subscribe\",\"params\":\"{}\"}}", &str);
@@ -85,6 +99,7 @@ impl WebSocketClient {
             .expect("failed to subscribe");
     }
 
+    /// Unscribes from one or more ticker.
     pub fn unsubscribe(&mut self, params: &Vec<&str>) {
         let str = params.join(",");
         let msg = format!("{{\"action\":\"unsubscribe\",\"params\":\"{}\"}}", &str);
@@ -93,6 +108,7 @@ impl WebSocketClient {
             .expect("failed to unsubscribe");
     }
 
+    /// Receives a single message.
     pub fn receive(&mut self) -> tungstenite::error::Result<Message> {
         self.websocket.read_message()
     }

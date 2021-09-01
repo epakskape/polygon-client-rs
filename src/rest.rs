@@ -97,9 +97,21 @@ impl RESTClient {
             .bearer_auth(&self.auth_key)
             .query(query_params)
             .send()
-            .await?;
+            .await;
 
-        res.json::<RespType>().await
+        match res {
+            Ok(res) => {
+                if res.status() == 200 {
+                    res.json::<RespType>().await
+                }
+                else {
+                    Err(res.error_for_status().err().unwrap())
+                }
+            }
+            Err(e) => {
+                Err(e)
+            }
+        }
     }
 
     //

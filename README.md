@@ -3,7 +3,7 @@
 [![Polygon-client on docs.rs][docsrs-image]][docsrs]
 
 [gh-image]: https://github.com/epakskape/polygon-client-rs/actions/workflows/buildandtest.yml/badge.svg
-[gh-checks]: https://github.com/epakskape/polygon-client-rs/actions?query=workflow%3Abuildandtest.yml
+[gh-checks]: https://github.com/epakskape/polygon-client-rs/actions?query=workflow%3ABuild%20and%20test
 [cratesio-image]: https://img.shields.io/crates/v/polygon-client.svg
 [cratesio]: https://crates.io/crates/polygon-client
 [docsrs-image]: https://docs.rs/polygon-client/badge.svg

@@ -1,4 +1,4 @@
-name: Rust
+name: Build and test
 
 on:
   push:
@@ -16,6 +16,9 @@ jobs:
 
     environment: TEST_ENVIRONMENT
     
+    env:
+      POLYGON_AUTH_KEY: ${{ secrets.POLYGON_AUTH_KEY }}
+
     steps:
     - uses: actions/checkout@v2
     - name: Build

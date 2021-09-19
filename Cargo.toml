@@ -4,7 +4,6 @@ description = "Rust client library for polygon.io"
 version = "0.1.0"
 authors = ["Matt Miller <mmiller@hick.org>"]
 license = "MIT"
-license-file = "LICENSE"
 repository = "https://github.com/epakskape/polygon-client-rs"
 readme = "README.md"
 edition = "2018"

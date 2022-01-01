@@ -51,11 +51,11 @@ impl WebSocketClient {
     ///
     /// The `cluster` parameter can be one of `STOCKS_CLUSTER`, `FOREX_CLUSTER`,
     /// or `CRYPTO_CLUSTER`.
-    /// 
+    ///
     /// The `auth_key` parameter optionally provides the API key to use for
-    /// authentication. If `None` is provided, then the API key specified in the 
+    /// authentication. If `None` is provided, then the API key specified in the
     /// `POLYGON_AUTH_KEY` environment variable is used.
-    /// 
+    ///
     /// # Panics
     ///
     /// This function will panic if `auth_key` is `None` and the
@@ -64,7 +64,7 @@ impl WebSocketClient {
         let auth_key_actual = match auth_key {
             Some(v) => String::from(v),
             _ => match env::var("POLYGON_AUTH_KEY") {
-                Ok(v) => String::from(v),
+                Ok(v) => v,
                 _ => panic!("POLYGON_AUTH_KEY not set"),
             },
         };
@@ -84,27 +84,31 @@ impl WebSocketClient {
     }
 
     fn _authenticate(&mut self) {
-        let str = format!("{{\"action\":\"auth\",\"params\":\"{}\"}}", self.auth_key);
+        let msg = format!("{{\"action\":\"auth\",\"params\":\"{}\"}}", self.auth_key);
         self.websocket
-            .write_message(Message::Text(str.into()))
+            .write_message(Message::Text(msg))
             .expect("failed to authenticate");
     }
 
     /// Subscribes to one or more ticker.
-    pub fn subscribe(&mut self, params: &Vec<&str>) {
-        let str = params.join(",");
-        let msg = format!("{{\"action\":\"subscribe\",\"params\":\"{}\"}}", &str);
+    pub fn subscribe(&mut self, params: &[&str]) {
+        let msg = format!(
+            "{{\"action\":\"subscribe\",\"params\":\"{}\"}}",
+            params.join(",")
+        );
         self.websocket
-            .write_message(Message::Text(msg.into()))
+            .write_message(Message::Text(msg))
             .expect("failed to subscribe");
     }
 
     /// Unscribes from one or more ticker.
-    pub fn unsubscribe(&mut self, params: &Vec<&str>) {
-        let str = params.join(",");
-        let msg = format!("{{\"action\":\"unsubscribe\",\"params\":\"{}\"}}", &str);
+    pub fn unsubscribe(&mut self, params: &[&str]) {
+        let msg = format!(
+            "{{\"action\":\"unsubscribe\",\"params\":\"{}\"}}",
+            params.join(",")
+        );
         self.websocket
-            .write_message(Message::Text(msg.into()))
+            .write_message(Message::Text(msg))
             .expect("failed to unsubscribe");
     }
 

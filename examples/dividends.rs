@@ -10,7 +10,7 @@ use polygon_client::rest::RESTClient;
 async fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() == 0 {
+    if args.is_empty() {
         println!("Usage: dividends <ticker1> <ticker2> <ticker3> ...");
         return;
     }
@@ -24,32 +24,25 @@ async fn main() {
         let dividends = client
             .reference_stock_dividends(ticker, &query_params)
             .await;
-        if dividends.is_ok() {
-            let dividends_ref = &dividends.unwrap();
+        if let Ok(dividends_ref) = dividends {
             let res = dividends_ref
                 .results
                 .iter()
-                .filter_map(|x| {
-                    let ex_date = NaiveDate::parse_from_str(&x.ex_date, "%Y-%m-%d").unwrap();
-
-                    if ex_date > one_year_ago.naive_local() {
-                        Some(x)
-                    } else {
-                        None
-                    }
+                .filter(|&x| {
+                    NaiveDate::parse_from_str(&x.ex_date, "%Y-%m-%d").unwrap()
+                        > one_year_ago.naive_local()
                 })
                 .collect::<Vec<_>>();
 
-            if res.len() > 0 {
+            if !res.is_empty() {
                 let previous_close_res = client
                     .stock_equities_previous_close(ticker, &query_params)
                     .await
-                    .expect(&format!(
-                        "unable to find previous close for ticker {}",
-                        ticker
-                    ));
+                    .unwrap_or_else(|_| {
+                        panic!("unable to find previous close for ticker {}", ticker)
+                    });
 
-                if previous_close_res.results.len() == 0 {
+                if previous_close_res.results.is_empty() {
                     panic!("no previous close found for ticker {}", ticker);
                 }
 

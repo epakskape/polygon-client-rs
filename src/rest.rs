@@ -65,20 +65,20 @@ impl RESTClient {
         let auth_key_actual = match auth_key {
             Some(v) => String::from(v),
             _ => match env::var("POLYGON_AUTH_KEY") {
-                Ok(v) => String::from(v),
+                Ok(v) => v,
                 _ => panic!("POLYGON_AUTH_KEY not set"),
             },
         };
 
         let mut client = reqwest::ClientBuilder::new();
 
-        if timeout.is_some() {
-            client = client.timeout(timeout.unwrap());
+        if let Some(timeout) = timeout {
+            client = client.timeout(timeout);
         }
 
         RESTClient {
             auth_key: auth_key_actual,
-            api_url: api_url,
+            api_url,
             client: client.build().unwrap(),
         }
     }
@@ -103,14 +103,11 @@ impl RESTClient {
             Ok(res) => {
                 if res.status() == 200 {
                     res.json::<RespType>().await
-                }
-                else {
+                } else {
                     Err(res.error_for_status().err().unwrap())
                 }
             }
-            Err(e) => {
-                Err(e)
-            }
+            Err(e) => Err(e),
         }
     }
 
@@ -619,7 +616,7 @@ mod tests {
                 .unwrap();
         assert_eq!(resp.status, "OK");
         let bond = resp.results.iter().find(|x| x.market == "BONDS");
-        assert_eq!(bond.is_some(), true);
+        assert!(bond.is_some());
         assert_eq!(bond.unwrap().desc, "Bonds");
     }
 
@@ -631,7 +628,7 @@ mod tests {
                 .unwrap();
         assert_eq!(resp.status, "OK");
         let bond = resp.results.iter().find(|x| x.locale == "US");
-        assert_eq!(bond.is_some(), true);
+        assert!(bond.is_some());
         assert_eq!(bond.unwrap().name, "United States of America");
     }
 
@@ -644,7 +641,7 @@ mod tests {
         .unwrap();
         assert_eq!(resp.status, "OK");
         let bond = resp.results.iter().find(|x| x.ex_date == "1998-02-23");
-        assert_eq!(bond.is_some(), true);
+        assert!(bond.is_some());
         assert_eq!(bond.unwrap().ratio, 0.5);
     }
 
@@ -657,7 +654,7 @@ mod tests {
         .unwrap();
         assert_eq!(resp.status, "OK");
         let bond = resp.results.iter().find(|x| x.ex_date == "2021-02-17");
-        assert_eq!(bond.is_some(), true);
+        assert!(bond.is_some());
         assert_eq!(bond.unwrap().amount, 0.56);
     }
 
@@ -670,13 +667,13 @@ mod tests {
         .unwrap();
         assert_eq!(resp.status, "OK");
         let fin = resp.results.iter().find(|x| x.ticker == "MSFT");
-        assert_eq!(fin.is_some(), true);
+        assert!(fin.is_some());
         let resp = tokio_test::block_on(
             RESTClient::new(None, None).reference_stock_financials("AAPL", &query_params),
         )
         .unwrap();
         let fin = resp.results.iter().find(|x| x.ticker == "AAPL");
-        assert_eq!(fin.is_some(), true);
+        assert!(fin.is_some());
     }
 
     #[test]
@@ -694,11 +691,8 @@ mod tests {
             println!("{} = true", v.0);
         }
         let income_statement = &result.financials.income_statement;
-        assert_eq!(income_statement.contains_key(FAC_REVENUES), true);
-        assert_eq!(
-            income_statement.get(FAC_REVENUES).unwrap().unit.is_some(),
-            true
-        );
+        assert!(income_statement.contains_key(FAC_REVENUES));
+        assert!(income_statement.get(FAC_REVENUES).unwrap().unit.is_some());
         assert_eq!(
             income_statement
                 .get(FAC_REVENUES)
@@ -741,7 +735,7 @@ mod tests {
         let dji = resp
             .iter()
             .find(|x| x.code.is_some() && x.code.as_ref().unwrap() == "DJI");
-        assert_eq!(dji.is_some(), true);
+        assert!(dji.is_some());
         assert_eq!(dji.unwrap().market, "index");
     }
 
@@ -755,7 +749,7 @@ mod tests {
         .unwrap();
         assert_ne!(resp.len(), 0);
         let regular = resp.iter().find(|x| x.1 == "Regular");
-        assert_eq!(regular.is_some(), true);
+        assert!(regular.is_some());
     }
 
     #[test]
@@ -842,8 +836,8 @@ mod tests {
             .results
             .iter()
             .find(|x| x.T.is_some() && x.T.as_ref().unwrap() == "MSFT");
-        assert_eq!(msft.is_some(), true);
-        assert_eq!(msft.unwrap().vw.is_some(), true);
+        assert!(msft.is_some());
+        assert!(msft.unwrap().vw.is_some());
         assert_eq!(msft.unwrap().vw.unwrap(), 221.41);
         assert_eq!(msft.unwrap().o, 223f64);
         assert_eq!(msft.unwrap().h, 224.22);
@@ -861,8 +855,8 @@ mod tests {
         assert_eq!(resp.status, "OK");
         assert_eq!(resp.results_count, 1);
         let result = resp.results.first();
-        assert_eq!(result.is_some(), true);
-        assert_eq!(result.unwrap().T.is_some(), true);
+        assert!(result.is_some());
+        assert!(result.unwrap().T.is_some());
         assert_eq!(result.unwrap().T.as_ref().unwrap(), "MSFT");
     }
 
@@ -897,7 +891,7 @@ mod tests {
         .unwrap();
         assert_ne!(resp.len(), 0);
         let coinbase = resp.iter().find(|x| x.name == "Coinbase");
-        assert_eq!(coinbase.is_some(), true);
+        assert!(coinbase.is_some());
     }
 
     #[test]
@@ -939,8 +933,8 @@ mod tests {
             .results
             .iter()
             .find(|x| x.T.is_some() && x.T.as_ref().unwrap() == "C:EURMUR");
-        assert_eq!(msft.is_some(), true);
-        assert_eq!(msft.unwrap().vw.is_some(), true);
+        assert!(msft.is_some());
+        assert!(msft.unwrap().vw.is_some());
         assert_eq!(msft.unwrap().vw.unwrap(), 45.2081);
         assert_eq!(msft.unwrap().o, 45.37);
         assert_eq!(msft.unwrap().h, 45.59);
@@ -958,8 +952,8 @@ mod tests {
         assert_eq!(resp.status, "OK");
         assert_eq!(resp.results_count, 1);
         let result = resp.results.first();
-        assert_eq!(result.is_some(), true);
-        assert_eq!(result.unwrap().T.is_some(), true);
+        assert!(result.is_some());
+        assert!(result.unwrap().T.is_some());
         assert_eq!(result.unwrap().T.as_ref().unwrap(), "C:EURUSD");
     }
 
@@ -975,7 +969,7 @@ mod tests {
         ))
         .unwrap();
         assert_eq!(resp.symbol, "BTC-USD");
-        assert_eq!(resp.is_utc, true);
+        assert!(resp.is_utc);
         assert_eq!(resp.open, 11443f64);
         assert_eq!(resp.close, 11427.7);
     }
@@ -1018,8 +1012,8 @@ mod tests {
             .results
             .iter()
             .find(|x| x.T.is_some() && x.T.as_ref().unwrap() == "X:LTCUSD");
-        assert_eq!(msft.is_some(), true);
-        assert_eq!(msft.unwrap().vw.is_some(), true);
+        assert!(msft.is_some());
+        assert!(msft.unwrap().vw.is_some());
         assert_eq!(msft.unwrap().vw.unwrap(), 50.1376);
         assert_eq!(msft.unwrap().o, 49.981);
         assert_eq!(msft.unwrap().h, 51.095);
@@ -1037,8 +1031,8 @@ mod tests {
         assert_eq!(resp.status, "OK");
         assert_eq!(resp.results_count, 1);
         let result = resp.results.first();
-        assert_eq!(result.is_some(), true);
-        assert_eq!(result.unwrap().T.is_some(), true);
+        assert!(result.is_some());
+        assert!(result.unwrap().T.is_some());
         assert_eq!(result.unwrap().T.as_ref().unwrap(), "X:BTCUSD");
     }
 }

@@ -4,6 +4,3 @@ pub mod rest;
 pub mod types;
 #[cfg(feature = "websocket")]
 pub mod websocket;
-
-#[macro_use]
-extern crate lazy_static;

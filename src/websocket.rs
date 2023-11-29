@@ -19,32 +19,36 @@
 //!     println!("msg: {}", msg_text);
 //! }
 //! ```
-use std::env;
-use url::Url;
+use std::env::{self, VarError};
 
-use serde;
-use serde::Deserialize;
-
-use tungstenite::client::connect;
-use tungstenite::{Message, WebSocket};
+use futures_util::{SinkExt, StreamExt};
+use thiserror::Error as ThisError;
+use tokio::net::TcpStream;
+use tokio_tungstenite::{tungstenite::Message, MaybeTlsStream, WebSocketStream};
+use url::{ParseError, Url};
 
 pub const STOCKS_CLUSTER: &str = "stocks";
 pub const FOREX_CLUSTER: &str = "forex";
 pub const CRYPTO_CLUSTER: &str = "crypto";
 
-#[derive(Clone, Deserialize, Debug)]
-struct ConnectedMessage {
-    pub ev: String,
-    pub status: String,
-    pub message: String,
-}
-
 pub struct WebSocketClient {
     pub auth_key: String,
-    websocket: WebSocket<tungstenite::stream::MaybeTlsStream<std::net::TcpStream>>,
+    websocket: WebSocketStream<MaybeTlsStream<TcpStream>>,
 }
 
-static DEFAULT_WS_HOST: &str = "wss://socket.polygon.io";
+const DEFAULT_WS_HOST: &str = "wss://socket.polygon.io";
+
+#[derive(Debug, ThisError)]
+pub enum Error {
+    #[error(transparent)]
+    Env(#[from] VarError),
+    #[error(transparent)]
+    Url(#[from] ParseError),
+    #[error(transparent)]
+    Ws(#[from] tokio_tungstenite::tungstenite::Error),
+    #[error("connection closed")]
+    Closed,
+}
 
 impl WebSocketClient {
     /// Returns a new WebSocket client.
@@ -60,84 +64,82 @@ impl WebSocketClient {
     ///
     /// This function will panic if `auth_key` is `None` and the
     /// `POLYGON_AUTH_KEY` environment variable is not set.
-    pub fn new(cluster: &str, auth_key: Option<&str>) -> Self {
+    pub async fn new(cluster: &str, auth_key: Option<&str>) -> Result<Self, Error> {
         let auth_key_actual = match auth_key {
             Some(v) => String::from(v),
-            _ => match env::var("POLYGON_AUTH_KEY") {
-                Ok(v) => v,
-                _ => panic!("POLYGON_AUTH_KEY not set"),
-            },
+            _ => env::var("POLYGON_AUTH_KEY")?,
         };
 
         let url_str = format!("{}/{}", DEFAULT_WS_HOST, cluster);
-        let url = Url::parse(&url_str).unwrap();
-        let sock = connect(url).expect("failed to connect").0;
+        let url = Url::parse(&url_str)?;
+        let websocket = tokio_tungstenite::connect_async(url).await?.0;
 
         let mut wsc = WebSocketClient {
             auth_key: auth_key_actual,
-            websocket: sock,
+            websocket,
         };
 
-        wsc._authenticate();
+        wsc.authenticate().await?;
 
-        wsc
+        Ok(wsc)
     }
 
-    fn _authenticate(&mut self) {
+    async fn authenticate(&mut self) -> Result<(), Error> {
         let msg = format!("{{\"action\":\"auth\",\"params\":\"{}\"}}", self.auth_key);
-        self.websocket
-            .write_message(Message::Text(msg))
-            .expect("failed to authenticate");
+        self.websocket.send(Message::Text(msg)).await?;
+        Ok(())
     }
 
     /// Subscribes to one or more ticker.
-    pub fn subscribe(&mut self, params: &[&str]) {
+    pub async fn subscribe(&mut self, params: &[&str]) -> Result<(), Error> {
         let msg = format!(
             "{{\"action\":\"subscribe\",\"params\":\"{}\"}}",
             params.join(",")
         );
-        self.websocket
-            .write_message(Message::Text(msg))
-            .expect("failed to subscribe");
+        self.websocket.send(Message::Text(msg)).await?;
+        Ok(())
     }
 
     /// Unscribes from one or more ticker.
-    pub fn unsubscribe(&mut self, params: &[&str]) {
+    pub async fn unsubscribe(&mut self, params: &[&str]) -> Result<(), Error> {
         let msg = format!(
             "{{\"action\":\"unsubscribe\",\"params\":\"{}\"}}",
             params.join(",")
         );
-        self.websocket
-            .write_message(Message::Text(msg))
-            .expect("failed to unsubscribe");
+        self.websocket.send(Message::Text(msg)).await?;
+        Ok(())
     }
 
     /// Receives a single message.
-    pub fn receive(&mut self) -> tungstenite::error::Result<Message> {
-        self.websocket.read_message()
+    pub async fn receive(&mut self) -> Result<Message, Error> {
+        Ok(self.websocket.next().await.ok_or(Error::Closed)??)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::websocket::ConnectedMessage;
-    use crate::websocket::WebSocketClient;
-    use crate::websocket::STOCKS_CLUSTER;
+    use super::*;
+    use serde::Deserialize;
 
-    #[test]
-    fn test_subscribe() {
-        let mut socket = WebSocketClient::new(STOCKS_CLUSTER, None);
-        let params = vec!["T.MSFT"];
-        socket.subscribe(&params);
+    #[derive(Clone, Deserialize, Debug)]
+    struct ConnectedMessage {
+        ev: String,
+        status: String,
+        #[allow(dead_code)]
+        message: String,
     }
 
-    #[test]
-    fn test_receive() {
-        let mut socket = WebSocketClient::new(STOCKS_CLUSTER, None);
-        let res = socket.receive();
-        assert_eq!(res.is_ok(), true);
-        let msg = res.unwrap();
-        assert_eq!(msg.is_text(), true);
+    #[tokio::test]
+    async fn test_subscribe() {
+        let mut socket = WebSocketClient::new(STOCKS_CLUSTER, None).await.unwrap();
+        let params = vec!["T.MSFT"];
+        socket.subscribe(&params).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn test_receive() {
+        let mut socket = WebSocketClient::new(STOCKS_CLUSTER, None).await.unwrap();
+        let msg = socket.receive().await.unwrap();
         let msg_str = msg.into_text().unwrap();
         let messages: Vec<ConnectedMessage> = serde_json::from_str(&msg_str).unwrap();
         let connected = messages.first().unwrap();

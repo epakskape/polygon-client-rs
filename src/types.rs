@@ -237,29 +237,30 @@ pub struct ReferenceStockSplitsResponseV2 {
 pub type ReferenceStockSplitsResponse = ReferenceStockSplitsResponseV2;
 
 //
-// v2/reference/dividends/{stocksTicker}
+// v3/reference/dividends/
 //
 
 #[derive(Clone, Deserialize, Debug)]
-pub struct ReferenceStockDividendsResultV2 {
-    pub ticker: String,
-    #[serde(rename = "exDate")]
-    pub ex_date: String,
-    #[serde(rename = "paymentDate")]
-    pub payment_date: String,
-    #[serde(rename = "recordDate")]
+pub struct ReferenceStockDividendsResultV3 {
+    pub cash_amount: f64,
+    pub currency: String,
+    pub declaration_date: String,
+    pub dividend_type: DividendType,
+    pub ex_dividend_date: String,
+    pub frequency: u32,
+    pub pay_date: String,
     pub record_date: String,
-    pub amount: f64,
+    pub ticker: String,
 }
 
 #[derive(Clone, Deserialize, Debug)]
-pub struct ReferenceStockDividendsResponseV2 {
+pub struct ReferenceStockDividendsResponseV3 {
+    pub next_url: Option<String>,
+    pub results: Vec<ReferenceStockDividendsResultV3>,
     pub status: String,
-    pub count: u32,
-    pub results: Vec<ReferenceStockDividendsResultV2>,
 }
 
-pub type ReferenceStockDividendsResponse = ReferenceStockDividendsResponseV2;
+pub type ReferenceStockDividendsResponse = ReferenceStockDividendsResponseV3;
 
 //
 // v2/reference/financials/{stocksTicker}
@@ -862,6 +863,25 @@ pub type StockEquitiesExchangesResponse = Vec<StockEquitiesExchangeV1>;
 pub enum TickType {
     Trades,
     Quotes,
+}
+
+#[derive(Clone, Deserialize, Debug)]
+pub enum DividendType {
+    CD, // Consistent dividends paid on schedule
+    SC, // Special cash dividends (not to be expected to be consistenly paid)
+    LT, // Long-term capital gain distributions
+    ST, // Short-term capital gain distributions
+}
+
+impl fmt::Display for DividendType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            DividendType::CD => write!(f, "CD"),
+            DividendType::SC => write!(f, "SC"),
+            DividendType::LT => write!(f, "LT"),
+            DividendType::ST => write!(f, "ST"),
+        }
+    }
 }
 
 impl fmt::Display for TickType {

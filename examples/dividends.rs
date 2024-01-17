@@ -29,7 +29,7 @@ async fn main() {
                 .results
                 .iter()
                 .filter(|&x| {
-                    NaiveDate::parse_from_str(&x.ex_date, "%Y-%m-%d").unwrap()
+                    NaiveDate::parse_from_str(&x.ex_dividend_date, "%Y-%m-%d").unwrap()
                         > one_year_ago.naive_local()
                 })
                 .collect::<Vec<_>>();
@@ -47,7 +47,7 @@ async fn main() {
                 }
 
                 let close = previous_close_res.results.first().unwrap().c;
-                let sum: f64 = res.iter().map(|d| d.amount).sum();
+                let sum: f64 = res.iter().map(|d| d.cash_amount).sum();
 
                 println!("Yield for {} is {:.2}% [previous close = {}, sum of last {} dividends = {:.2}]",
                     ticker,

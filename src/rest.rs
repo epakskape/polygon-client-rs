@@ -206,13 +206,13 @@ impl RESTClient {
     }
 
     /// Get a list of historical dividends for a stock using the
-    /// [/v2/reference/dividends/{stocks_ticker}](https://polygon.io/docs/get_v2_reference_dividends__stocksTicker__anchor) API.
+    /// [/v3/reference/dividends/{stocks_ticker}](https://polygon.io/docs/get_v3_reference_dividends__stocksTicker__anchor) API.
     pub async fn reference_stock_dividends(
         &self,
         stocks_ticker: &str,
         query_params: &HashMap<&str, &str>,
     ) -> Result<ReferenceStockDividendsResponse, reqwest::Error> {
-        let uri = format!("/v2/reference/dividends/{}", stocks_ticker);
+        let uri = format!("/v3/reference/dividends?ticker={}", stocks_ticker);
         self.send_request::<ReferenceStockDividendsResponse>(&uri, query_params)
             .await
     }
